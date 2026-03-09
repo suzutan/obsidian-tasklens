@@ -50,6 +50,7 @@ export function TaskSection({
           />
           <TaskInlineAdd
             fileWatcher={fileWatcher}
+            store={store}
             projectPath={projectPath}
             section={title}
           />
