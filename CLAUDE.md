@@ -126,12 +126,13 @@ src/
 
 ## 開発サイクル
 
-1. 最新の master を起点にブランチを作成
-2. 区切りの良い作業単位で commit, push
+1. 最新のmaster/mainを起点にブランチを作成
+2. 区切りの良い作業単位でcommit,push
 3. 1つ目のコミットを行った後は必ずPRを起票する
-   - master とブランチの差分を確認し、PR title, body を作成・または更新する
-   - PR Body は `.github/pull_request_template.md` をベースに書く
-   - PR job が成功することを確認する
+   - master/mainとブランチの差分を確認し、PR title, bodyを作成・または更新する。
+   - PR Bodyは `.github/pull_request_template.md` をベースに書くこと。
+   - PR jobが成功することを確認する
+4. PR checkがpassしたらマージする
 
 ## コミット規約
 
