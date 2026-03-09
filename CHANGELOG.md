@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.3.0...v0.4.0) (2026-03-09)
+
+
+### Features
+
+* auto-reload settings on external data.json changes ([#20](https://github.com/suzutan/obsidian-tasklens/issues/20)) ([b8a3b32](https://github.com/suzutan/obsidian-tasklens/commit/b8a3b32ac55fcdc2e540c4a9af7484e03ffdece0))
+
 ## [0.3.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.2.1...v0.3.0) (2026-03-09)
 
 
