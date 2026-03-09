@@ -46,15 +46,38 @@ export function parseNaturalLanguage(input: string): ParsedInput {
     return "";
   });
 
+  // Extract brace-enclosed due date: {YYYY-MM-DD HH:MM} or {YYYY-MM-DD}
+  // Also supports {M/D}, {M/D HH:MM}, {M月D日}, {M月D日 HH:MM}
+  text = text.replace(/\{([^}]+)\}/g, (_, inner: string) => {
+    const trimmed = inner.trim();
+    const braceResult = parseBraceDate(trimmed);
+    if (braceResult) {
+      if (!dueDate) dueDate = braceResult.date;
+      if (braceResult.time && !dueTime) dueTime = braceResult.time;
+    }
+    return "";
+  });
+
   // --- Date extraction ---
+  // Natural language dates (3/10, 明日, etc.) → 予定日 (scheduled)
+  // Brace dates ({3/10 13:00}) → 期限 (due) — already extracted above
   const result = extractDates(text);
   text = result.remaining;
-  dueDate = result.dueDate;
-  dueTime = result.dueTime;
-  scheduledDate = result.scheduledDate;
-  scheduledTime = result.scheduledTime;
-  startDate = result.startDate;
-  startTime = result.startTime;
+  if (result.dueDate) {
+    // Natural language dates become scheduled date
+    if (!scheduledDate) {
+      scheduledDate = result.dueDate;
+      scheduledTime = result.dueTime;
+    }
+  }
+  if (!scheduledDate && result.scheduledDate) {
+    scheduledDate = result.scheduledDate;
+    scheduledTime = result.scheduledTime;
+  }
+  if (!startDate && result.startDate) {
+    startDate = result.startDate;
+    startTime = result.startTime;
+  }
 
   // Clean up
   text = text.replace(/\s{2,}/g, " ").trim();
@@ -302,6 +325,46 @@ function tryExtractWeekday(
   setter(formatDate(d));
 
   return text.slice(0, match.index) + " " + text.slice(match.index + match[0].length);
+}
+
+/**
+ * Parse a date string inside braces: {YYYY-MM-DD}, {YYYY-MM-DD HH:MM},
+ * {M/D}, {M/D HH:MM}, {M月D日}, {M月D日 HH:MM}
+ */
+function parseBraceDate(s: string): { date: string; time: string | null } | null {
+  // YYYY-MM-DD HH:MM or YYYY-MM-DD
+  {
+    const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:\s+(\d{1,2}:\d{2}))?$/);
+    if (m) {
+      const y = parseInt(m[1]);
+      const mo = parseInt(m[2]);
+      const d = parseInt(m[3]);
+      if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+        const date = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        return { date, time: m[4] ? normalizeTime(m[4]) : null };
+      }
+    }
+  }
+
+  // M/D HH:MM or M/D
+  {
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}:\d{2}))?$/);
+    if (m) {
+      const date = resolveMonthDay(parseInt(m[1]), parseInt(m[2]));
+      if (date) return { date, time: m[3] ? normalizeTime(m[3]) : null };
+    }
+  }
+
+  // M月D日 HH:MM or M月D日
+  {
+    const m = s.match(/^(\d{1,2})月(\d{1,2})日(?:\s+(\d{1,2}:\d{2}))?$/);
+    if (m) {
+      const date = resolveMonthDay(parseInt(m[1]), parseInt(m[2]));
+      if (date) return { date, time: m[3] ? normalizeTime(m[3]) : null };
+    }
+  }
+
+  return null;
 }
 
 /**
