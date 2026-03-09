@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/suzutan/obsidian-tasklens/compare/tasklens-v0.2.0...tasklens-v0.2.1) (2026-03-09)
+
+
+### Bug Fixes
+
+* always show date in timer and add dev workflow docs ([#16](https://github.com/suzutan/obsidian-tasklens/issues/16)) ([8465df6](https://github.com/suzutan/obsidian-tasklens/commit/8465df646e936cd0dc657b8acfbc25c2a64c10fd))
+
 ## [0.2.0](https://github.com/suzutan/obsidian-tasklens/compare/tasklens-v0.1.0...tasklens-v0.2.0) (2026-03-09)
 
 
