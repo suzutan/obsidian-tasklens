@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { Priority } from "../../models/Task";
+import type { Priority } from "../../models/Task";
 
 interface TaskCheckboxProps {
   priority: Priority;
@@ -19,6 +18,7 @@ export function TaskCheckbox({ priority, completed, onChange }: TaskCheckboxProp
 
   return (
     <button
+      type="button"
       class={`tasklens-checkbox ${completed ? "tasklens-checkbox--done" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
@@ -26,11 +26,7 @@ export function TaskCheckbox({ priority, completed, onChange }: TaskCheckboxProp
       }}
       style={{
         borderColor: color,
-        backgroundColor: completed
-          ? color
-          : priority !== 4
-          ? `${color}20`
-          : "transparent",
+        backgroundColor: completed ? color : priority !== 4 ? `${color}20` : "transparent",
       }}
     >
       {completed && (

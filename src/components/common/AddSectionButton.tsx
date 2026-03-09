@@ -1,6 +1,5 @@
-import { h } from "preact";
-import { useState, useRef, useEffect } from "preact/hooks";
-import { FileWatcher } from "../../store/FileWatcher";
+import { useEffect, useRef, useState } from "preact/hooks";
+import type { FileWatcher } from "../../store/FileWatcher";
 
 interface AddSectionButtonProps {
   projectPath: string;
@@ -31,10 +30,7 @@ export function AddSectionButton({ projectPath, fileWatcher }: AddSectionButtonP
 
   if (!editing) {
     return (
-      <button
-        class="tasklens-add-section-btn"
-        onClick={() => setEditing(true)}
-      >
+      <button type="button" class="tasklens-add-section-btn" onClick={() => setEditing(true)}>
         <span class="tasklens-add-section-icon">+</span>
         セクションを追加
       </button>
@@ -59,10 +55,11 @@ export function AddSectionButton({ projectPath, fileWatcher }: AddSectionButtonP
         }}
       />
       <div class="tasklens-add-section-actions">
-        <button class="tasklens-btn tasklens-btn-primary tasklens-btn-sm" onClick={handleSubmit}>
+        <button type="button" class="tasklens-btn tasklens-btn-primary tasklens-btn-sm" onClick={handleSubmit}>
           追加
         </button>
         <button
+          type="button"
           class="tasklens-btn tasklens-btn-sm"
           onClick={() => {
             setName("");

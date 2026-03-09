@@ -1,5 +1,5 @@
-import { Task, TimerConfig } from "../models/Task";
 import { serializeRecurrence } from "../models/RecurrenceRule";
+import type { Task, TimerConfig } from "../models/Task";
 
 /**
  * Serialize a Task to Obsidian Tasks emoji format:
@@ -84,11 +84,11 @@ function serializeTimerConfig(config: TimerConfig): string {
  * Serialize an entire file with sections and tasks
  */
 export function serializeTaskFile(
-  frontmatter: Record<string, any>,
+  frontmatter: Record<string, unknown>,
   title: string,
   description: string | null,
   sectionOrder: string[],
-  sections: Map<string, Task[]>
+  sections: Map<string, Task[]>,
 ): string {
   const lines: string[] = [];
 

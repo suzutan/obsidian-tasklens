@@ -1,19 +1,18 @@
-import { h } from "preact";
-import { useState, useEffect, useCallback, useRef } from "preact/hooks";
-import { Task, StaminaConfig, PeriodicIncrementConfig } from "../../models/Task";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import type { PeriodicIncrementConfig, StaminaConfig, Task } from "../../models/Task";
 import {
-  getTimerType,
-  hasResourceTimer,
-  computeTimerState,
-  computeStaminaState,
   computePeriodicState,
+  computeStaminaState,
+  computeTimerState,
   formatDuration,
   formatTime,
-  getTimerColor,
   getResourceColor,
-  TimerState,
-  StaminaState,
-  PeriodicIncrementState,
+  getTimerColor,
+  getTimerType,
+  hasResourceTimer,
+  type PeriodicIncrementState,
+  type StaminaState,
+  type TimerState,
 } from "../../utils/TimerUtils";
 
 interface TimerDisplayProps {
@@ -50,22 +49,10 @@ export function TimerDisplay({ task, variant = "chip", onUpdateTimerConfig }: Ti
   // Resource timers (stamina / periodic)
   if (isResource && task.timerConfig) {
     if (task.timerConfig.type === "stamina") {
-      return (
-        <StaminaDisplay
-          config={task.timerConfig}
-          variant={variant}
-          onUpdate={onUpdateTimerConfig}
-        />
-      );
+      return <StaminaDisplay config={task.timerConfig} variant={variant} onUpdate={onUpdateTimerConfig} />;
     }
     if (task.timerConfig.type === "periodic") {
-      return (
-        <PeriodicDisplay
-          config={task.timerConfig}
-          variant={variant}
-          onUpdate={onUpdateTimerConfig}
-        />
-      );
+      return <PeriodicDisplay config={task.timerConfig} variant={variant} onUpdate={onUpdateTimerConfig} />;
     }
   }
 
@@ -89,13 +76,7 @@ function CountdownTimerDisplay({
 
   useEffect(() => {
     const update = () => {
-      const s = computeTimerState(
-        timerType,
-        task.dueDate,
-        task.dueTime,
-        task.startDate,
-        task.startTime
-      );
+      const s = computeTimerState(timerType, task.dueDate, task.dueTime, task.startDate, task.startTime);
       setState(s);
     };
     update();
@@ -110,9 +91,7 @@ function CountdownTimerDisplay({
   if (variant === "chip") {
     return (
       <span class="tasklens-timer-chip" style={{ color }}>
-        <span class="tasklens-timer-icon">
-          {state.isExpired ? "🔴" : "⏱"}
-        </span>
+        <span class="tasklens-timer-icon">{state.isExpired ? "🔴" : "⏱"}</span>
         <span class="tasklens-timer-label">{getCountdownLabel(state)}</span>
         <span class="tasklens-timer-value">{duration}</span>
       </span>
@@ -143,13 +122,14 @@ function CountdownTimerDisplay({
       {state.type === "countdown-elapsed" && (
         <div class="tasklens-timer-detail-sub">
           {state.mode === "countdown"
-            ? `UNTIL ${task.dueDate}${task.dueTime ? " " + task.dueTime : ""}`
-            : `SINCE ${task.dueDate}${task.dueTime ? " " + task.dueTime : ""}`}
+            ? `UNTIL ${task.dueDate}${task.dueTime ? ` ${task.dueTime}` : ""}`
+            : `SINCE ${task.dueDate}${task.dueTime ? ` ${task.dueTime}` : ""}`}
         </div>
       )}
       {state.type === "elapsed" && task.startDate && (
         <div class="tasklens-timer-detail-sub">
-          SINCE {task.startDate}{task.startTime ? " " + task.startTime : ""}
+          SINCE {task.startDate}
+          {task.startTime ? ` ${task.startTime}` : ""}
         </div>
       )}
     </div>
@@ -198,7 +178,7 @@ function StaminaDisplay({
       const newVal = Math.max(0, Math.min(state.currentValue + delta, config.maxValue));
       onUpdate({ ...config, currentValue: newVal, lastUpdatedAt: now });
     },
-    [config, state.currentValue, onUpdate]
+    [config, state.currentValue, onUpdate],
   );
 
   if (variant === "chip") {
@@ -218,7 +198,9 @@ function StaminaDisplay({
         {fullAt && (
           <>
             <span class="tasklens-timer-sep">|</span>
-            <span class="tasklens-timer-eta">全回復 {formatDuration(state.timeToFullMs)} ({fullAt})</span>
+            <span class="tasklens-timer-eta">
+              全回復 {formatDuration(state.timeToFullMs)} ({fullAt})
+            </span>
           </>
         )}
       </span>
@@ -239,10 +221,7 @@ function StaminaDisplay({
       </div>
       <div class="tasklens-timer-progress">
         <div class="tasklens-timer-progress-bar">
-          <div
-            class="tasklens-timer-progress-fill"
-            style={{ width: `${progressPercent}%`, backgroundColor: color }}
-          />
+          <div class="tasklens-timer-progress-fill" style={{ width: `${progressPercent}%`, backgroundColor: color }} />
         </div>
         <span class="tasklens-timer-progress-text">{progressPercent}%</span>
       </div>
@@ -288,15 +267,57 @@ function ResourceActions({
     <div class="tasklens-timer-actions">
       <div class="tasklens-timer-actions-row">
         <span class="tasklens-timer-actions-label">消費</span>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(-1)} disabled={currentValue <= 0}>-1</button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(-10)} disabled={currentValue <= 0}>-10</button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(-50)} disabled={currentValue <= 0}>-50</button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(-1)}
+          disabled={currentValue <= 0}
+        >
+          -1
+        </button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(-10)}
+          disabled={currentValue <= 0}
+        >
+          -10
+        </button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(-50)}
+          disabled={currentValue <= 0}
+        >
+          -50
+        </button>
       </div>
       <div class="tasklens-timer-actions-row">
         <span class="tasklens-timer-actions-label">回復</span>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(1)} disabled={currentValue >= maxValue}>+1</button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(10)} disabled={currentValue >= maxValue}>+10</button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onAdjust(50)} disabled={currentValue >= maxValue}>+50</button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(1)}
+          disabled={currentValue >= maxValue}
+        >
+          +1
+        </button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(10)}
+          disabled={currentValue >= maxValue}
+        >
+          +10
+        </button>
+        <button
+          type="button"
+          class="tasklens-btn tasklens-btn--small"
+          onClick={() => onAdjust(50)}
+          disabled={currentValue >= maxValue}
+        >
+          +50
+        </button>
       </div>
       <div class="tasklens-timer-actions-row">
         <input
@@ -310,22 +331,33 @@ function ResourceActions({
           onInput={(e) => setCustomValue((e.target as HTMLInputElement).value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              const v = parseInt(customValue);
-              if (!isNaN(v)) { onSet(Math.max(0, Math.min(v, maxValue))); setCustomValue(""); }
+              const v = parseInt(customValue, 10);
+              if (!Number.isNaN(v)) {
+                onSet(Math.max(0, Math.min(v, maxValue)));
+                setCustomValue("");
+              }
             }
           }}
         />
         <button
+          type="button"
           class="tasklens-btn tasklens-btn--small"
           onClick={() => {
-            const v = parseInt(customValue);
-            if (!isNaN(v)) { onSet(Math.max(0, Math.min(v, maxValue))); setCustomValue(""); }
+            const v = parseInt(customValue, 10);
+            if (!Number.isNaN(v)) {
+              onSet(Math.max(0, Math.min(v, maxValue)));
+              setCustomValue("");
+            }
           }}
         >
           設定
         </button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onSet(0)}>0</button>
-        <button class="tasklens-btn tasklens-btn--small" onClick={() => onSet(maxValue)}>MAX</button>
+        <button type="button" class="tasklens-btn tasklens-btn--small" onClick={() => onSet(0)}>
+          0
+        </button>
+        <button type="button" class="tasklens-btn tasklens-btn--small" onClick={() => onSet(maxValue)}>
+          MAX
+        </button>
       </div>
     </div>
   );
@@ -349,7 +381,13 @@ function PeriodicDisplay({
     update();
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
-  }, [config.currentValue, config.maxValue, config.incrementAmount, config.scheduleTimes.join(","), config.lastUpdatedAt]);
+  }, [
+    config.currentValue,
+    config.maxValue,
+    config.incrementAmount,
+    config.scheduleTimes.join(","),
+    config.lastUpdatedAt,
+  ]);
 
   const color = getResourceColor(state.progress);
 
@@ -360,7 +398,7 @@ function PeriodicDisplay({
       const newVal = Math.max(0, Math.min(state.currentValue + delta, config.maxValue));
       onUpdate({ ...config, currentValue: newVal, lastUpdatedAt: now });
     },
-    [config, state.currentValue, onUpdate]
+    [config, state.currentValue, onUpdate],
   );
 
   if (variant === "chip") {
@@ -380,7 +418,9 @@ function PeriodicDisplay({
         {maxAt && (
           <>
             <span class="tasklens-timer-sep">|</span>
-            <span class="tasklens-timer-eta">MAX {formatDuration(state.timeToMaxMs)} ({maxAt})</span>
+            <span class="tasklens-timer-eta">
+              MAX {formatDuration(state.timeToMaxMs)} ({maxAt})
+            </span>
           </>
         )}
       </span>
@@ -401,23 +441,19 @@ function PeriodicDisplay({
       </div>
       <div class="tasklens-timer-progress">
         <div class="tasklens-timer-progress-bar">
-          <div
-            class="tasklens-timer-progress-fill"
-            style={{ width: `${progressPercent}%`, backgroundColor: color }}
-          />
+          <div class="tasklens-timer-progress-fill" style={{ width: `${progressPercent}%`, backgroundColor: color }} />
         </div>
         <span class="tasklens-timer-progress-text">{progressPercent}%</span>
       </div>
       {!state.isAtMax && state.nextIncrementAt ? (
         <div class="tasklens-timer-detail-sub">
-          次の増加 {formatTime(state.nextIncrementAt)} (+{state.incrementAmount}) ・ MAX到達まで {formatDuration(state.timeToMaxMs)}
+          次の増加 {formatTime(state.nextIncrementAt)} (+{state.incrementAmount}) ・ MAX到達まで{" "}
+          {formatDuration(state.timeToMaxMs)}
         </div>
       ) : (
         <div class="tasklens-timer-detail-sub tasklens-timer-full">最大値到達</div>
       )}
-      <div class="tasklens-timer-detail-sub">
-        スケジュール: {config.scheduleTimes.join(", ")}
-      </div>
+      <div class="tasklens-timer-detail-sub">スケジュール: {config.scheduleTimes.join(", ")}</div>
       {onUpdate && (
         <ResourceActions
           currentValue={state.currentValue}

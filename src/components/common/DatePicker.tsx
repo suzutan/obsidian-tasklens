@@ -1,7 +1,6 @@
-import { h } from "preact";
 import { createPortal } from "preact/compat";
-import { useState, useEffect, useRef, useCallback, useMemo } from "preact/hooks";
-import { today, formatDate, getDateLabel, addDays } from "../../utils/DateUtils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { addDays, formatDate, getDateLabel, today } from "../../utils/DateUtils";
 
 interface DatePickerProps {
   value: string | null;
@@ -16,7 +15,16 @@ interface DatePickerProps {
 
 const DAY_HEADERS = ["月", "火", "水", "木", "金", "土", "日"];
 
-export function DatePicker({ value, time, onChange, icon, label, hint, externalOpen, onOpenChange }: DatePickerProps) {
+export function DatePicker({
+  value,
+  time,
+  onChange,
+  icon,
+  label: _label,
+  hint: _hint,
+  externalOpen,
+  onOpenChange,
+}: DatePickerProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = (v: boolean) => {
@@ -30,7 +38,7 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
 
   // Initialize calendar view to current value or today
   useEffect(() => {
-    const d = value ? new Date(value + "T00:00:00") : new Date();
+    const d = value ? new Date(`${value}T00:00:00`) : new Date();
     setViewYear(d.getFullYear());
     setViewMonth(d.getMonth());
     setTimeInput(time || "");
@@ -42,9 +50,9 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       // Check if click is inside the trigger container or the portal popover
-      if (containerRef.current && containerRef.current.contains(target)) return;
+      if (containerRef.current?.contains(target)) return;
       const popover = document.querySelector(".tasklens-datepicker-popover");
-      if (popover && popover.contains(target)) return;
+      if (popover?.contains(target)) return;
       setOpen(false);
     };
     document.addEventListener("mousedown", handler);
@@ -82,7 +90,7 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
       onChange(date, t);
       setOpen(false);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleTimeChange = useCallback(
@@ -93,7 +101,7 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
         onChange(value, newTime || null);
       }
     },
-    [value, onChange]
+    [value, onChange],
   );
 
   const handleTimeClear = useCallback(() => {
@@ -142,18 +150,13 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
     <div class="tasklens-datepicker" ref={containerRef}>
       {/* Value display (only when date is set) */}
       {displayText && (
-        <div
-          class="tasklens-datepicker-trigger tasklens-datepicker-trigger--set"
-          onClick={() => setOpen(!open)}
-        >
+        <div class="tasklens-datepicker-trigger tasklens-datepicker-trigger--set" onClick={() => setOpen(!open)}>
           {icon && <span class="tasklens-datepicker-icon">{icon}</span>}
-          <span
-            class="tasklens-datepicker-value"
-            style={{ color: displayText.color }}
-          >
+          <span class="tasklens-datepicker-value" style={{ color: displayText.color }}>
             {displayText.text}
           </span>
           <button
+            type="button"
             class="tasklens-datepicker-clear"
             onClick={(e) => {
               e.stopPropagation();
@@ -166,115 +169,138 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
       )}
 
       {/* Popover - rendered via portal to escape transform containing block */}
-      {open && createPortal(
-        <div class="tasklens-datepicker-popover" ref={popoverRef}>
-          {/* Quick shortcuts */}
-          <div class="tasklens-datepicker-shortcuts">
-            <button
-              class="tasklens-datepicker-shortcut"
-              onClick={() => handleSelect(todayStr, timeInput || null)}
-            >
-              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#058527" }}>📅</span>
-              <span>今日</span>
-              <span class="tasklens-datepicker-shortcut-day">{getDayName(todayStr)}</span>
-            </button>
-            <button
-              class="tasklens-datepicker-shortcut"
-              onClick={() => handleSelect(addDays(todayStr, 1), timeInput || null)}
-            >
-              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#eb8909" }}>☀️</span>
-              <span>明日</span>
-              <span class="tasklens-datepicker-shortcut-day">{getDayName(addDays(todayStr, 1))}</span>
-            </button>
-            <button
-              class="tasklens-datepicker-shortcut"
-              onClick={() => handleSelect(getNextWeekday(1), timeInput || null)}
-            >
-              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#4fc3f7" }}>📆</span>
-              <span>来週月曜</span>
-              <span class="tasklens-datepicker-shortcut-day">{getNextWeekday(1)}</span>
-            </button>
-            <button
-              class="tasklens-datepicker-shortcut"
-              onClick={() => handleSelect(addDays(todayStr, 7), timeInput || null)}
-            >
-              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#246fe0" }}>⏭️</span>
-              <span>1週間後</span>
-              <span class="tasklens-datepicker-shortcut-day">{getDayName(addDays(todayStr, 7))}</span>
-            </button>
-            <button
-              class="tasklens-datepicker-shortcut tasklens-datepicker-shortcut--clear"
-              onClick={() => handleSelect(null, null)}
-            >
-              <span class="tasklens-datepicker-shortcut-icon">🚫</span>
-              <span>日付なし</span>
-            </button>
-          </div>
-
-          <div class="tasklens-datepicker-divider" />
-
-          {/* Time input */}
-          <div class="tasklens-datepicker-time">
-            <span class="tasklens-datepicker-time-label">🕐 時刻</span>
-            <input
-              type="time"
-              class="tasklens-datepicker-time-input"
-              value={timeInput}
-              onInput={(e) => handleTimeChange((e.target as HTMLInputElement).value)}
-            />
-            {timeInput && (
-              <button class="tasklens-datepicker-time-clear" onClick={handleTimeClear}>✕</button>
-            )}
-          </div>
-
-          <div class="tasklens-datepicker-divider" />
-
-          {/* Mini calendar */}
-          <div class="tasklens-datepicker-calendar">
-            <div class="tasklens-datepicker-cal-header">
-              <button class="tasklens-datepicker-cal-nav" onClick={prevMonth}>‹</button>
-              <span class="tasklens-datepicker-cal-title">{monthLabel}</span>
-              <button class="tasklens-datepicker-cal-nav" onClick={nextMonth}>›</button>
+      {open &&
+        createPortal(
+          <div class="tasklens-datepicker-popover" ref={popoverRef}>
+            {/* Quick shortcuts */}
+            <div class="tasklens-datepicker-shortcuts">
+              <button
+                type="button"
+                class="tasklens-datepicker-shortcut"
+                onClick={() => handleSelect(todayStr, timeInput || null)}
+              >
+                <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#058527" }}>
+                  📅
+                </span>
+                <span>今日</span>
+                <span class="tasklens-datepicker-shortcut-day">{getDayName(todayStr)}</span>
+              </button>
+              <button
+                type="button"
+                class="tasklens-datepicker-shortcut"
+                onClick={() => handleSelect(addDays(todayStr, 1), timeInput || null)}
+              >
+                <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#eb8909" }}>
+                  ☀️
+                </span>
+                <span>明日</span>
+                <span class="tasklens-datepicker-shortcut-day">{getDayName(addDays(todayStr, 1))}</span>
+              </button>
+              <button
+                type="button"
+                class="tasklens-datepicker-shortcut"
+                onClick={() => handleSelect(getNextWeekday(1), timeInput || null)}
+              >
+                <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#4fc3f7" }}>
+                  📆
+                </span>
+                <span>来週月曜</span>
+                <span class="tasklens-datepicker-shortcut-day">{getNextWeekday(1)}</span>
+              </button>
+              <button
+                type="button"
+                class="tasklens-datepicker-shortcut"
+                onClick={() => handleSelect(addDays(todayStr, 7), timeInput || null)}
+              >
+                <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#246fe0" }}>
+                  ⏭️
+                </span>
+                <span>1週間後</span>
+                <span class="tasklens-datepicker-shortcut-day">{getDayName(addDays(todayStr, 7))}</span>
+              </button>
+              <button
+                type="button"
+                class="tasklens-datepicker-shortcut tasklens-datepicker-shortcut--clear"
+                onClick={() => handleSelect(null, null)}
+              >
+                <span class="tasklens-datepicker-shortcut-icon">🚫</span>
+                <span>日付なし</span>
+              </button>
             </div>
 
-            <div class="tasklens-datepicker-cal-grid">
-              {/* Day headers */}
-              {DAY_HEADERS.map((d) => (
-                <div key={d} class="tasklens-datepicker-cal-dayheader">{d}</div>
-              ))}
+            <div class="tasklens-datepicker-divider" />
 
-              {/* Day cells */}
-              {calendarDays.map((day, i) => {
-                if (!day) {
-                  return <div key={`e${i}`} class="tasklens-datepicker-cal-empty" />;
-                }
-                const dateStr = formatDate(new Date(viewYear, viewMonth, day));
-                const isToday = dateStr === todayStr;
-                const isSelected = dateStr === value;
-                const isPast = dateStr < todayStr;
-
-                return (
-                  <button
-                    key={day}
-                    class={[
-                      "tasklens-datepicker-cal-day",
-                      isToday && "tasklens-datepicker-cal-day--today",
-                      isSelected && "tasklens-datepicker-cal-day--selected",
-                      isPast && "tasklens-datepicker-cal-day--past",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    onClick={() => handleSelect(dateStr, timeInput || null)}
-                  >
-                    {day}
-                  </button>
-                );
-              })}
+            {/* Time input */}
+            <div class="tasklens-datepicker-time">
+              <span class="tasklens-datepicker-time-label">🕐 時刻</span>
+              <input
+                type="time"
+                class="tasklens-datepicker-time-input"
+                value={timeInput}
+                onInput={(e) => handleTimeChange((e.target as HTMLInputElement).value)}
+              />
+              {timeInput && (
+                <button type="button" class="tasklens-datepicker-time-clear" onClick={handleTimeClear}>
+                  ✕
+                </button>
+              )}
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+
+            <div class="tasklens-datepicker-divider" />
+
+            {/* Mini calendar */}
+            <div class="tasklens-datepicker-calendar">
+              <div class="tasklens-datepicker-cal-header">
+                <button type="button" class="tasklens-datepicker-cal-nav" onClick={prevMonth}>
+                  ‹
+                </button>
+                <span class="tasklens-datepicker-cal-title">{monthLabel}</span>
+                <button type="button" class="tasklens-datepicker-cal-nav" onClick={nextMonth}>
+                  ›
+                </button>
+              </div>
+
+              <div class="tasklens-datepicker-cal-grid">
+                {/* Day headers */}
+                {DAY_HEADERS.map((d) => (
+                  <div key={d} class="tasklens-datepicker-cal-dayheader">
+                    {d}
+                  </div>
+                ))}
+
+                {/* Day cells */}
+                {calendarDays.map((day, i) => {
+                  if (!day) {
+                    return <div key={`e${i}`} class="tasklens-datepicker-cal-empty" />;
+                  }
+                  const dateStr = formatDate(new Date(viewYear, viewMonth, day));
+                  const isToday = dateStr === todayStr;
+                  const isSelected = dateStr === value;
+                  const isPast = dateStr < todayStr;
+
+                  return (
+                    <button
+                      type="button"
+                      key={day}
+                      class={[
+                        "tasklens-datepicker-cal-day",
+                        isToday && "tasklens-datepicker-cal-day--today",
+                        isSelected && "tasklens-datepicker-cal-day--selected",
+                        isPast && "tasklens-datepicker-cal-day--past",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => handleSelect(dateStr, timeInput || null)}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -298,8 +324,8 @@ function buildCalendarGrid(year: number, month: number): (number | null)[] {
 const DAY_NAMES_SHORT = ["日", "月", "火", "水", "木", "金", "土"];
 
 function getDayName(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00");
-  return DAY_NAMES_SHORT[d.getDay()] + "曜日";
+  const d = new Date(`${dateStr}T00:00:00`);
+  return `${DAY_NAMES_SHORT[d.getDay()]}曜日`;
 }
 
 function getNextWeekday(targetDay: number): string {

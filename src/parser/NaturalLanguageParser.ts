@@ -1,5 +1,5 @@
-import { Priority } from "../models/Task";
-import { today, formatDate } from "../utils/DateUtils";
+import type { Priority } from "../models/Task";
+import { formatDate } from "../utils/DateUtils";
 
 export interface ParsedInput {
   content: string;
@@ -36,7 +36,7 @@ export function parseNaturalLanguage(input: string): ParsedInput {
 
   // Extract priority: p1, p2, p3, p4 (word boundary)
   text = text.replace(/\bp([1-4])\b/g, (_, p) => {
-    priority = parseInt(p) as Priority;
+    priority = parseInt(p, 10) as Priority;
     return "";
   });
 
@@ -98,10 +98,10 @@ interface DateExtractResult {
 function extractDates(text: string): DateExtractResult {
   let dueDate: string | null = null;
   let dueTime: string | null = null;
-  let scheduledDate: string | null = null;
-  let scheduledTime: string | null = null;
-  let startDate: string | null = null;
-  let startTime: string | null = null;
+  const scheduledDate: string | null = null;
+  const scheduledTime: string | null = null;
+  const startDate: string | null = null;
+  const startTime: string | null = null;
   let remaining = text;
 
   // --- Relative date keywords (Japanese) ---
@@ -113,15 +113,16 @@ function extractDates(text: string): DateExtractResult {
       const d = new Date();
       dueDate = formatDate(d);
       dueTime = normalizeTime(m[1]);
-      remaining = remaining.slice(0, m.index) + " " + remaining.slice(m.index + m[0].length);
+      remaining = `${remaining.slice(0, m.index)} ${remaining.slice(m.index + m[0].length)}`;
     }
   }
 
   // "今日" without time
   if (!dueDate) {
-    remaining = tryExtractRelativeDate(remaining, /(?:^|\s)今日\s*(?:の|に|まで(?:に)?)?\s*/g, 0, (d) => {
-      dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractRelativeDate(remaining, /(?:^|\s)今日\s*(?:の|に|まで(?:に)?)?\s*/g, 0, (d) => {
+        dueDate = d;
+      }) || remaining;
   }
 
   // "明日 HH:MM"
@@ -132,50 +133,66 @@ function extractDates(text: string): DateExtractResult {
       d.setDate(d.getDate() + 1);
       dueDate = formatDate(d);
       dueTime = normalizeTime(m[1]);
-      remaining = remaining.slice(0, m.index) + " " + remaining.slice(m.index + m[0].length);
+      remaining = `${remaining.slice(0, m.index)} ${remaining.slice(m.index + m[0].length)}`;
     }
   }
 
   // "明日" without time
   if (!dueDate) {
-    remaining = tryExtractRelativeDate(remaining, /(?:^|\s)明日\s*(?:の|に|まで(?:に)?)?\s*/g, 1, (d) => {
-      dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractRelativeDate(remaining, /(?:^|\s)明日\s*(?:の|に|まで(?:に)?)?\s*/g, 1, (d) => {
+        dueDate = d;
+      }) || remaining;
   }
 
   // "明後日"
   if (!dueDate) {
-    remaining = tryExtractRelativeDate(remaining, /(?:^|\s)明後日\s*(?:の|に|まで(?:に)?)?\s*/g, 2, (d) => {
-      dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractRelativeDate(remaining, /(?:^|\s)明後日\s*(?:の|に|まで(?:に)?)?\s*/g, 2, (d) => {
+        dueDate = d;
+      }) || remaining;
   }
 
   // "今週X曜日" / "今週X曜"
   if (!dueDate) {
-    remaining = tryExtractWeekday(remaining, /(?:^|\s)今週\s*([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g, 0, (d) => {
-      dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractWeekday(
+        remaining,
+        /(?:^|\s)今週\s*([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g,
+        0,
+        (d) => {
+          dueDate = d;
+        },
+      ) || remaining;
   }
 
   // "来週X曜日" / "来週X曜"
   if (!dueDate) {
-    remaining = tryExtractWeekday(remaining, /(?:^|\s)来週\s*([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g, 1, (d) => {
-      dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractWeekday(
+        remaining,
+        /(?:^|\s)来週\s*([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g,
+        1,
+        (d) => {
+          dueDate = d;
+        },
+      ) || remaining;
   }
 
   // "X曜日" (this week, next occurrence)
   if (!dueDate) {
-    remaining = tryExtractWeekday(remaining, /(?:^|\s)([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g, -1, (d) => {
-      if (!dueDate) dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractWeekday(remaining, /(?:^|\s)([月火水木金土日])曜(?:日)?\s*(?:の|に|まで(?:に)?)?\s*/g, -1, (d) => {
+        if (!dueDate) dueDate = d;
+      }) || remaining;
   }
 
   // "来週"
   if (!dueDate) {
-    remaining = tryExtractRelativeDate(remaining, /(?:^|\s)来週\s*(?:の|に|まで(?:に)?)?\s*/g, 7, (d) => {
-      if (!dueDate) dueDate = d;
-    }) || remaining;
+    remaining =
+      tryExtractRelativeDate(remaining, /(?:^|\s)来週\s*(?:の|に|まで(?:に)?)?\s*/g, 7, (d) => {
+        if (!dueDate) dueDate = d;
+      }) || remaining;
   }
 
   // --- Absolute dates ---
@@ -185,11 +202,11 @@ function extractDates(text: string): DateExtractResult {
     const mdTimeRe = /(?:^|\s)(\d{1,2})\/(\d{1,2})\s+(\d{1,2}:\d{2})\s*(?:に|まで(?:に)?)?\s*/g;
     const match = mdTimeRe.exec(remaining);
     if (match) {
-      const parsed = resolveMonthDay(parseInt(match[1]), parseInt(match[2]));
+      const parsed = resolveMonthDay(parseInt(match[1], 10), parseInt(match[2], 10));
       if (parsed) {
         dueDate = parsed;
         dueTime = normalizeTime(match[3]);
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -199,11 +216,11 @@ function extractDates(text: string): DateExtractResult {
     const jpDateTimeRe = /(?:^|\s)(\d{1,2})月(\d{1,2})日\s+(\d{1,2}:\d{2})\s*(?:に|まで(?:に)?)?\s*/g;
     const match = jpDateTimeRe.exec(remaining);
     if (match) {
-      const parsed = resolveMonthDay(parseInt(match[1]), parseInt(match[2]));
+      const parsed = resolveMonthDay(parseInt(match[1], 10), parseInt(match[2], 10));
       if (parsed) {
         dueDate = parsed;
         dueTime = normalizeTime(match[3]);
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -213,10 +230,10 @@ function extractDates(text: string): DateExtractResult {
     const mdRe = /(?:^|\s)(\d{1,2})\/(\d{1,2})\s*(?:に|まで(?:に)?)?\s*/g;
     const match = mdRe.exec(remaining);
     if (match) {
-      const parsed = resolveMonthDay(parseInt(match[1]), parseInt(match[2]));
+      const parsed = resolveMonthDay(parseInt(match[1], 10), parseInt(match[2], 10));
       if (parsed) {
         dueDate = parsed;
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -226,10 +243,10 @@ function extractDates(text: string): DateExtractResult {
     const jpDateRe = /(?:^|\s)(\d{1,2})月(\d{1,2})日\s*(?:に|まで(?:に)?)?\s*/g;
     const match = jpDateRe.exec(remaining);
     if (match) {
-      const parsed = resolveMonthDay(parseInt(match[1]), parseInt(match[2]));
+      const parsed = resolveMonthDay(parseInt(match[1], 10), parseInt(match[2], 10));
       if (parsed) {
         dueDate = parsed;
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -239,13 +256,13 @@ function extractDates(text: string): DateExtractResult {
     const isoTimeRe = /(?:^|\s)(\d{4})[-/](\d{1,2})[-/](\d{1,2})\s+(\d{1,2}:\d{2})\s*(?:に|まで(?:に)?)?\s*/g;
     const match = isoTimeRe.exec(remaining);
     if (match) {
-      const y = parseInt(match[1]);
-      const mo = parseInt(match[2]);
-      const d = parseInt(match[3]);
+      const y = parseInt(match[1], 10);
+      const mo = parseInt(match[2], 10);
+      const d = parseInt(match[3], 10);
       if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
         dueDate = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
         dueTime = normalizeTime(match[4]);
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -255,12 +272,12 @@ function extractDates(text: string): DateExtractResult {
     const isoRe = /(?:^|\s)(\d{4})[-/](\d{1,2})[-/](\d{1,2})\s*(?:に|まで(?:に)?)?\s*/g;
     const match = isoRe.exec(remaining);
     if (match) {
-      const y = parseInt(match[1]);
-      const mo = parseInt(match[2]);
-      const d = parseInt(match[3]);
+      const y = parseInt(match[1], 10);
+      const mo = parseInt(match[2], 10);
+      const d = parseInt(match[3], 10);
       if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
         dueDate = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-        remaining = remaining.slice(0, match.index) + " " + remaining.slice(match.index + match[0].length);
+        remaining = `${remaining.slice(0, match.index)} ${remaining.slice(match.index + match[0].length)}`;
       }
     }
   }
@@ -273,14 +290,14 @@ function extractDates(text: string): DateExtractResult {
  */
 function normalizeTime(time: string): string {
   const [h, m] = time.split(":");
-  return `${String(parseInt(h)).padStart(2, "0")}:${m}`;
+  return `${String(parseInt(h, 10)).padStart(2, "0")}:${m}`;
 }
 
 function tryExtractRelativeDate(
   text: string,
   regex: RegExp,
   daysFromToday: number,
-  setter: (d: string) => void
+  setter: (d: string) => void,
 ): string | null {
   const match = regex.exec(text);
   if (!match) return null;
@@ -289,18 +306,24 @@ function tryExtractRelativeDate(
   d.setDate(d.getDate() + daysFromToday);
   setter(formatDate(d));
 
-  return text.slice(0, match.index) + " " + text.slice(match.index + match[0].length);
+  return `${text.slice(0, match.index)} ${text.slice(match.index + match[0].length)}`;
 }
 
 const WEEKDAY_MAP: Record<string, number> = {
-  "日": 0, "月": 1, "火": 2, "水": 3, "木": 4, "金": 5, "土": 6,
+  日: 0,
+  月: 1,
+  火: 2,
+  水: 3,
+  木: 4,
+  金: 5,
+  土: 6,
 };
 
 function tryExtractWeekday(
   text: string,
   regex: RegExp,
   weekOffset: number, // 0=this week, 1=next week, -1=next occurrence
-  setter: (d: string) => void
+  setter: (d: string) => void,
 ): string | null {
   const match = regex.exec(text);
   if (!match) return null;
@@ -324,7 +347,7 @@ function tryExtractWeekday(
   d.setDate(d.getDate() + diff);
   setter(formatDate(d));
 
-  return text.slice(0, match.index) + " " + text.slice(match.index + match[0].length);
+  return `${text.slice(0, match.index)} ${text.slice(match.index + match[0].length)}`;
 }
 
 /**
@@ -336,9 +359,9 @@ function parseBraceDate(s: string): { date: string; time: string | null } | null
   {
     const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:\s+(\d{1,2}:\d{2}))?$/);
     if (m) {
-      const y = parseInt(m[1]);
-      const mo = parseInt(m[2]);
-      const d = parseInt(m[3]);
+      const y = parseInt(m[1], 10);
+      const mo = parseInt(m[2], 10);
+      const d = parseInt(m[3], 10);
       if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
         const date = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
         return { date, time: m[4] ? normalizeTime(m[4]) : null };
@@ -350,7 +373,7 @@ function parseBraceDate(s: string): { date: string; time: string | null } | null
   {
     const m = s.match(/^(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}:\d{2}))?$/);
     if (m) {
-      const date = resolveMonthDay(parseInt(m[1]), parseInt(m[2]));
+      const date = resolveMonthDay(parseInt(m[1], 10), parseInt(m[2], 10));
       if (date) return { date, time: m[3] ? normalizeTime(m[3]) : null };
     }
   }
@@ -359,7 +382,7 @@ function parseBraceDate(s: string): { date: string; time: string | null } | null
   {
     const m = s.match(/^(\d{1,2})月(\d{1,2})日(?:\s+(\d{1,2}:\d{2}))?$/);
     if (m) {
-      const date = resolveMonthDay(parseInt(m[1]), parseInt(m[2]));
+      const date = resolveMonthDay(parseInt(m[1], 10), parseInt(m[2], 10));
       if (date) return { date, time: m[3] ? normalizeTime(m[3]) : null };
     }
   }

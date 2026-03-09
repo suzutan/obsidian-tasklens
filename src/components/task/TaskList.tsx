@@ -1,9 +1,8 @@
-import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { Task } from "../../models/Task";
+import type { Task } from "../../models/Task";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
 import { TaskItem } from "./TaskItem";
-import { TaskStore } from "../../store/TaskStore";
-import { FileWatcher } from "../../store/FileWatcher";
 
 interface TaskListProps {
   tasks: Task[];
@@ -47,7 +46,7 @@ export function TaskList({
 
       await fileWatcher.moveTask(draggedId, dropProjectPath, dropSection, targetIndex);
     },
-    [fileWatcher, projectPath, section]
+    [fileWatcher, projectPath, section],
   );
 
   const handleEmptyDrop = useCallback(
@@ -58,7 +57,7 @@ export function TaskList({
       // Drop at end of section
       await fileWatcher.moveTask(draggedId, projectPath, section, activeTasks.length);
     },
-    [fileWatcher, projectPath, section, activeTasks.length]
+    [fileWatcher, projectPath, section, activeTasks.length],
   );
 
   return (
@@ -82,17 +81,9 @@ export function TaskList({
       ))}
       {completedTasks.length > 0 && (
         <details class="tasklens-completed-section">
-          <summary class="tasklens-completed-header">
-            完了済み ({completedTasks.length})
-          </summary>
+          <summary class="tasklens-completed-header">完了済み ({completedTasks.length})</summary>
           {completedTasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              store={store}
-              fileWatcher={fileWatcher}
-              showProject={showProject}
-            />
+            <TaskItem key={task.id} task={task} store={store} fileWatcher={fileWatcher} showProject={showProject} />
           ))}
         </details>
       )}

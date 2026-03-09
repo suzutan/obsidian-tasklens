@@ -1,12 +1,12 @@
-import { App, TFile, TFolder, debounce } from "obsidian";
-import { TaskStore } from "./TaskStore";
+import { type App, debounce, TFile } from "obsidian";
+import { getNextDueDate } from "../models/RecurrenceRule";
+import { createTaskId, type Priority, type Task } from "../models/Task";
+import { type ParsedInput, parseNaturalLanguage } from "../parser/NaturalLanguageParser";
 import { parseTaskFile } from "../parser/TaskParser";
 import { serializeTask } from "../parser/TaskSerializer";
-import { Task, Priority, createTaskId } from "../models/Task";
+import { formatDateTimeForFrontmatter, today } from "../utils/DateUtils";
 import { getAllMarkdownFiles, isExcluded } from "../utils/FileUtils";
-import { today, formatDateTimeForFrontmatter } from "../utils/DateUtils";
-import { getNextDueDate } from "../models/RecurrenceRule";
-import { parseNaturalLanguage, ParsedInput } from "../parser/NaturalLanguageParser";
+import type { TaskStore } from "./TaskStore";
 
 export class FileWatcher {
   private app: App;
@@ -21,11 +21,7 @@ export class FileWatcher {
     this.store = store;
     this.excludeFolders = excludeFolders;
     this.defaultTarget = defaultTarget;
-    this.debounceReload = debounce(
-      () => this.fullReload(),
-      500,
-      true
-    );
+    this.debounceReload = debounce(() => this.fullReload(), 500, true);
   }
 
   updateConfig(excludeFolders: string[], defaultTarget: string): void {
@@ -188,10 +184,7 @@ export class FileWatcher {
       // Update the updated timestamp in frontmatter (if present)
       let result = newLines.join("\n");
       if (/updated:\s*.+/.test(result)) {
-        result = result.replace(
-          /updated:\s*.+/,
-          `updated: ${formatDateTimeForFrontmatter()}`
-        );
+        result = result.replace(/updated:\s*.+/, `updated: ${formatDateTimeForFrontmatter()}`);
       }
 
       await this.app.vault.modify(file, result);
@@ -301,10 +294,7 @@ export class FileWatcher {
 
       let result = newLines.join("\n");
       if (/updated:\s*.+/.test(result)) {
-        result = result.replace(
-          /updated:\s*.+/,
-          `updated: ${formatDateTimeForFrontmatter()}`
-        );
+        result = result.replace(/updated:\s*.+/, `updated: ${formatDateTimeForFrontmatter()}`);
       }
 
       await this.app.vault.modify(file, result);
@@ -317,12 +307,7 @@ export class FileWatcher {
   /**
    * Move a task to a different position (for drag & drop reordering)
    */
-  async moveTask(
-    taskId: string,
-    targetFilePath: string,
-    targetSection: string,
-    targetIndex: number
-  ): Promise<void> {
+  async moveTask(taskId: string, targetFilePath: string, targetSection: string, targetIndex: number): Promise<void> {
     const task = this.store.getTaskById(taskId);
     if (!task) return;
 
@@ -363,7 +348,9 @@ export class FileWatcher {
       const insertAt = targetIndex > fromIdx ? targetIndex - 1 : targetIndex;
       sectionTasks.splice(Math.min(insertAt, sectionTasks.length), 0, moved);
 
-      sectionTasks.forEach((t, i) => (t.order = i));
+      for (let i = 0; i < sectionTasks.length; i++) {
+        sectionTasks[i].order = i;
+      }
 
       await this.rebuildFile(file, parsed);
     } finally {
@@ -388,11 +375,25 @@ export class FileWatcher {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        if (i === 0 && line.trim() === "---") { inFrontmatter = true; newLines.push(line); continue; }
-        if (inFrontmatter) { newLines.push(line); if (line.trim() === "---") inFrontmatter = false; continue; }
+        if (i === 0 && line.trim() === "---") {
+          inFrontmatter = true;
+          newLines.push(line);
+          continue;
+        }
+        if (inFrontmatter) {
+          newLines.push(line);
+          if (line.trim() === "---") inFrontmatter = false;
+          continue;
+        }
 
         const secMatch = line.match(/^## (.+)$/);
-        if (secMatch) { currentSection = secMatch[1].trim(); taskOrder = 0; skipping = false; newLines.push(line); continue; }
+        if (secMatch) {
+          currentSection = secMatch[1].trim();
+          taskOrder = 0;
+          skipping = false;
+          newLines.push(line);
+          continue;
+        }
 
         if (line.match(/^\s*- \[[ x]\]/)) {
           if (skipping) skipping = false;
@@ -440,8 +441,16 @@ export class FileWatcher {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        if (i === 0 && line.trim() === "---") { inFrontmatter = true; newLines.push(line); continue; }
-        if (inFrontmatter) { newLines.push(line); if (line.trim() === "---") inFrontmatter = false; continue; }
+        if (i === 0 && line.trim() === "---") {
+          inFrontmatter = true;
+          newLines.push(line);
+          continue;
+        }
+        if (inFrontmatter) {
+          newLines.push(line);
+          if (line.trim() === "---") inFrontmatter = false;
+          continue;
+        }
 
         const secMatch = line.match(/^## (.+)$/);
         if (secMatch) {
@@ -492,9 +501,19 @@ export class FileWatcher {
         if (!inFrontmatter) continue;
         continue;
       }
-      if (inFrontmatter) { lines.push(line); continue; }
-      if (line.match(/^# /) && !sectionsDone) { lines.push(line); lines.push(""); continue; }
-      if (!sectionsDone && !line.match(/^##/) && line.trim()) { lines.push(line); continue; }
+      if (inFrontmatter) {
+        lines.push(line);
+        continue;
+      }
+      if (line.match(/^# /) && !sectionsDone) {
+        lines.push(line);
+        lines.push("");
+        continue;
+      }
+      if (!sectionsDone && !line.match(/^##/) && line.trim()) {
+        lines.push(line);
+        continue;
+      }
       if (line.match(/^##/)) sectionsDone = true;
       if (sectionsDone) break;
     }
@@ -567,12 +586,9 @@ export class FileWatcher {
     this.writing = true;
     try {
       let content = await this.app.vault.read(file);
-      content = content.trimEnd() + `\n\n## ${sectionName}\n\n`;
+      content = `${content.trimEnd()}\n\n## ${sectionName}\n\n`;
       if (/updated:\s*.+/.test(content)) {
-        content = content.replace(
-          /updated:\s*.+/,
-          `updated: ${formatDateTimeForFrontmatter()}`
-        );
+        content = content.replace(/updated:\s*.+/, `updated: ${formatDateTimeForFrontmatter()}`);
       }
       await this.app.vault.modify(file, content);
       await this.fullReload();

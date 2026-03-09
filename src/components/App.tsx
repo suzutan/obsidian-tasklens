@@ -1,9 +1,8 @@
-import { h } from "preact";
-import { App as ObsidianApp } from "obsidian";
-import { TaskStore } from "../store/TaskStore";
-import { FileWatcher } from "../store/FileWatcher";
-import { Sidebar } from "./sidebar/Sidebar";
+import type { App as ObsidianApp } from "obsidian";
+import type { FileWatcher } from "../store/FileWatcher";
+import type { TaskStore } from "../store/TaskStore";
 import { FilterContent } from "./content/FilterContent";
+import { Sidebar } from "./sidebar/Sidebar";
 import { TaskDetailPanel } from "./task/TaskDetailPanel";
 
 interface AppProps {
@@ -59,24 +58,17 @@ export function App({ store, fileWatcher, app, onSaveFilters }: AppProps) {
         <Sidebar store={store} fileWatcher={fileWatcher} app={app} onSaveFilters={onSaveFilters} />
       </div>
       <div class="tasklens-main">
-        <FilterContent
-          store={store}
-          fileWatcher={fileWatcher}
-          title={getTitle()}
-          query={getQuery()}
-        />
+        <FilterContent store={store} fileWatcher={fileWatcher} title={getTitle()} query={getQuery()} />
       </div>
       {selectedTaskId && (
-        <div class="tasklens-detail-overlay" onClick={(e: MouseEvent) => {
-          if (e.target === e.currentTarget) store.selectTask(null);
-        }}>
+        <div
+          class="tasklens-detail-overlay"
+          onClick={(e: MouseEvent) => {
+            if (e.target === e.currentTarget) store.selectTask(null);
+          }}
+        >
           <div class="tasklens-detail-modal">
-            <TaskDetailPanel
-              store={store}
-              fileWatcher={fileWatcher}
-              app={app}
-              taskId={selectedTaskId}
-            />
+            <TaskDetailPanel store={store} fileWatcher={fileWatcher} app={app} taskId={selectedTaskId} />
           </div>
         </div>
       )}

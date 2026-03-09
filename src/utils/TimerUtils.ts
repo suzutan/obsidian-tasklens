@@ -7,7 +7,7 @@
  * - #periodic → +N at scheduled HH:MM times up to max
  */
 
-import { StaminaConfig, PeriodicIncrementConfig, TimerConfig } from "../models/Task";
+import type { PeriodicIncrementConfig, StaminaConfig } from "../models/Task";
 
 export type TimerType = "countdown" | "elapsed" | "countdown-elapsed" | null;
 
@@ -89,7 +89,7 @@ export function computeTimerState(
   dueTime: string | null,
   startDate: string | null,
   startTime: string | null,
-  createdAt?: Date
+  createdAt?: Date,
 ): TimerState | null {
   const now = Date.now();
 
@@ -355,15 +355,15 @@ export function getTimerColor(state: TimerState): string {
 
   const p = state.progress;
   if (p < 0.25) return "#058527"; // green
-  if (p < 0.5) return "#246fe0";  // blue
+  if (p < 0.5) return "#246fe0"; // blue
   if (p < 0.75) return "#eb8909"; // orange
-  return "#d1453b";               // red
+  return "#d1453b"; // red
 }
 
 /** Get color for resource timer based on fill ratio (bright, readable on dark bg) */
 export function getResourceColor(progress: number): string {
   if (progress >= 0.75) return "#4caf50"; // bright green - mostly full
-  if (progress >= 0.5) return "#42a5f5";  // bright blue
+  if (progress >= 0.5) return "#42a5f5"; // bright blue
   if (progress >= 0.25) return "#ffa726"; // bright orange
-  return "#ef5350";                        // bright red - nearly empty
+  return "#ef5350"; // bright red - nearly empty
 }

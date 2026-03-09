@@ -1,11 +1,10 @@
-import { h } from "preact";
-import { useState, useRef, useEffect } from "preact/hooks";
-import { App as ObsidianApp, Menu } from "obsidian";
-import { TaskStore, ViewType } from "../../store/TaskStore";
-import { FileWatcher } from "../../store/FileWatcher";
-import { NavItem } from "./NavItem";
-import { BUILT_IN_FILTERS, FilterDefinition } from "../../settings";
+import { Menu, type App as ObsidianApp } from "obsidian";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { BUILT_IN_FILTERS, type FilterDefinition } from "../../settings";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
 import { EmojiPicker } from "../common/EmojiPicker";
+import { NavItem } from "./NavItem";
 
 interface SidebarProps {
   store: TaskStore;
@@ -14,7 +13,7 @@ interface SidebarProps {
   onSaveFilters?: (filters: FilterDefinition[]) => void;
 }
 
-export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps) {
+export function Sidebar({ store, fileWatcher: _fileWatcher, app: _app, onSaveFilters }: SidebarProps) {
   const currentView = store.currentView.value;
   const todayCount = store.todayCount.value;
   const overdueCount = store.overdueCount.value;
@@ -27,7 +26,9 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
     try {
       const saved = localStorage.getItem("tasklens-collapsed-sections");
       return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
+    } catch {
+      return {};
+    }
   };
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
 
@@ -59,7 +60,7 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
     const firstSlash = p.indexOf("/");
     const folder = firstSlash > 0 ? p.substring(0, firstSlash) : "(root)";
     if (!folders.has(folder)) folders.set(folder, []);
-    folders.get(folder)!.push(p);
+    folders.get(folder)?.push(p);
   }
 
   const getCount = (filterId: string): number | undefined => {
@@ -102,7 +103,7 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
       updated = customFilters.map((f) =>
         f.id === editingFilterId
           ? { ...f, name: filterName.trim(), query: filterQuery.trim(), icon: filterIcon || "🔍" }
-          : f
+          : f,
       );
     } else {
       // Add new
@@ -169,24 +170,25 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
       <div class="tasklens-sidebar-section">
         <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("filters")}>
           <div class="tasklens-section-toggle">
-            <span class={`tasklens-section-chevron ${collapsed["filters"] ? "is-collapsed" : ""}`}>›</span>
+            <span class={`tasklens-section-chevron ${collapsed.filters ? "is-collapsed" : ""}`}>›</span>
             <span>フィルター</span>
           </div>
           <button
+            type="button"
             class="tasklens-btn-icon"
-            onClick={(e: MouseEvent) => { e.stopPropagation(); openAddForm(); }}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              openAddForm();
+            }}
             title="フィルターを追加"
           >
             +
           </button>
         </div>
-        {!collapsed["filters"] && (
+        {!collapsed.filters && (
           <>
             {customFilters.map((filter) => (
-              <div
-                key={filter.id}
-                onContextMenu={(e: MouseEvent) => handleFilterContextMenu(e, filter)}
-              >
+              <div key={filter.id} onContextMenu={(e: MouseEvent) => handleFilterContextMenu(e, filter)}>
                 <NavItem
                   icon={filter.icon || "🔍"}
                   label={filter.name}
@@ -222,10 +224,16 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
                   rows={4}
                 />
                 <div class="tasklens-add-filter-actions">
-                  <button class="tasklens-btn tasklens-btn-primary tasklens-btn--small" onClick={handleSaveFilter}>
+                  <button
+                    type="button"
+                    class="tasklens-btn tasklens-btn-primary tasklens-btn--small"
+                    onClick={handleSaveFilter}
+                  >
                     {editingFilterId ? "保存" : "追加"}
                   </button>
-                  <button class="tasklens-btn tasklens-btn--small" onClick={closeForm}>キャンセル</button>
+                  <button type="button" class="tasklens-btn tasklens-btn--small" onClick={closeForm}>
+                    キャンセル
+                  </button>
                 </div>
               </div>
             )}
@@ -237,16 +245,14 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
       <div class="tasklens-sidebar-section">
         <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("labels")}>
           <div class="tasklens-section-toggle">
-            <span class={`tasklens-section-chevron ${collapsed["labels"] ? "is-collapsed" : ""}`}>›</span>
+            <span class={`tasklens-section-chevron ${collapsed.labels ? "is-collapsed" : ""}`}>›</span>
             <span>ラベル</span>
           </div>
           {labels.length > 0 && <span class="tasklens-section-count">{labels.length}</span>}
         </div>
-        {!collapsed["labels"] && (
+        {!collapsed.labels && (
           <>
-            {labels.length === 0 && (
-              <div class="tasklens-sidebar-empty">ラベルなし</div>
-            )}
+            {labels.length === 0 && <div class="tasklens-sidebar-empty">ラベルなし</div>}
             {labels.map((label) => (
               <NavItem
                 key={label}
@@ -264,16 +270,14 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
       <div class="tasklens-sidebar-section">
         <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("sources")}>
           <div class="tasklens-section-toggle">
-            <span class={`tasklens-section-chevron ${collapsed["sources"] ? "is-collapsed" : ""}`}>›</span>
+            <span class={`tasklens-section-chevron ${collapsed.sources ? "is-collapsed" : ""}`}>›</span>
             <span>ソース</span>
           </div>
           {folders.size > 0 && <span class="tasklens-section-count">{folders.size}</span>}
         </div>
-        {!collapsed["sources"] && (
+        {!collapsed.sources && (
           <>
-            {folders.size === 0 && (
-              <div class="tasklens-sidebar-empty">タスクが見つかりません</div>
-            )}
+            {folders.size === 0 && <div class="tasklens-sidebar-empty">タスクが見つかりません</div>}
             {[...folders.entries()].map(([folder, paths]) => (
               <div key={folder} class="tasklens-sidebar-source-group">
                 <NavItem

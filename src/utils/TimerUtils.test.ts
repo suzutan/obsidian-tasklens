@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { PeriodicIncrementConfig, StaminaConfig } from "../models/Task";
 import {
+  computePeriodicState,
+  computeStaminaState,
+  computeTimerState,
+  formatDuration,
+  getResourceColor,
+  getTimerColor,
   getTimerType,
   hasResourceTimer,
-  computeTimerState,
-  computeStaminaState,
-  computePeriodicState,
-  formatDuration,
-  getTimerColor,
-  getResourceColor,
 } from "./TimerUtils";
-import { StaminaConfig, PeriodicIncrementConfig } from "../models/Task";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -60,16 +60,16 @@ describe("computeTimerState", () => {
     it("returns remaining ms for future due date", () => {
       const state = computeTimerState("countdown", "2026-03-11", null, null, null);
       expect(state).not.toBeNull();
-      expect(state!.type).toBe("countdown");
-      expect(state!.mode).toBe("countdown");
-      expect(state!.isExpired).toBe(false);
+      expect(state?.type).toBe("countdown");
+      expect(state?.mode).toBe("countdown");
+      expect(state?.isExpired).toBe(false);
       // 15 hours remaining (2026-03-11T00:00:00 - 2026-03-10T09:00:00)
-      expect(state!.ms).toBe(15 * 60 * 60 * 1000);
+      expect(state?.ms).toBe(15 * 60 * 60 * 1000);
     });
 
     it("returns expired state for past due date", () => {
       const state = computeTimerState("countdown", "2026-03-09", null, null, null);
-      expect(state!.isExpired).toBe(true);
+      expect(state?.isExpired).toBe(true);
     });
 
     it("returns null when no due date", () => {
@@ -79,8 +79,8 @@ describe("computeTimerState", () => {
 
     it("handles due time", () => {
       const state = computeTimerState("countdown", "2026-03-10", "12:00", null, null);
-      expect(state!.ms).toBe(3 * 60 * 60 * 1000); // 3 hours
-      expect(state!.isExpired).toBe(false);
+      expect(state?.ms).toBe(3 * 60 * 60 * 1000); // 3 hours
+      expect(state?.isExpired).toBe(false);
     });
   });
 
@@ -88,10 +88,10 @@ describe("computeTimerState", () => {
     it("returns elapsed ms from start date", () => {
       const state = computeTimerState("elapsed", null, null, "2026-03-09", null);
       expect(state).not.toBeNull();
-      expect(state!.type).toBe("elapsed");
-      expect(state!.mode).toBe("elapsed");
+      expect(state?.type).toBe("elapsed");
+      expect(state?.mode).toBe("elapsed");
       // 33 hours elapsed (2026-03-10T09:00:00 - 2026-03-09T00:00:00)
-      expect(state!.ms).toBe(33 * 60 * 60 * 1000);
+      expect(state?.ms).toBe(33 * 60 * 60 * 1000);
     });
 
     it("returns null when no start date", () => {
@@ -103,14 +103,14 @@ describe("computeTimerState", () => {
   describe("countdown-elapsed", () => {
     it("counts down before due date", () => {
       const state = computeTimerState("countdown-elapsed", "2026-03-11", null, null, null);
-      expect(state!.mode).toBe("countdown");
-      expect(state!.isExpired).toBe(false);
+      expect(state?.mode).toBe("countdown");
+      expect(state?.isExpired).toBe(false);
     });
 
     it("shows elapsed after due date", () => {
       const state = computeTimerState("countdown-elapsed", "2026-03-09", null, null, null);
-      expect(state!.mode).toBe("elapsed");
-      expect(state!.isExpired).toBe(true);
+      expect(state?.mode).toBe("elapsed");
+      expect(state?.isExpired).toBe(true);
     });
   });
 
@@ -212,7 +212,7 @@ describe("computePeriodicState", () => {
     const state = computePeriodicState(config);
     expect(state.nextIncrementAt).not.toBeNull();
     // Next event should be at 12:00 today
-    expect(state.nextIncrementAt!.getHours()).toBe(12);
+    expect(state.nextIncrementAt?.getHours()).toBe(12);
   });
 });
 

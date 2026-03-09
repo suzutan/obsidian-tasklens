@@ -1,9 +1,9 @@
-import { App, Modal } from "obsidian";
-import { TaskStore } from "../store/TaskStore";
-import { FileWatcher } from "../store/FileWatcher";
+import { type App, Modal } from "obsidian";
 import { parseNaturalLanguage } from "../parser/NaturalLanguageParser";
+import type { FileWatcher } from "../store/FileWatcher";
+import type { TaskStore } from "../store/TaskStore";
 import { getDateLabel } from "../utils/DateUtils";
-import { getTagSuggestions, applyTagSuggestion, TagSuggestState } from "../utils/TagSuggest";
+import { applyTagSuggestion, getTagSuggestions, type TagSuggestState } from "../utils/TagSuggest";
 
 export class QuickAddModal extends Modal {
   private store: TaskStore;
@@ -127,7 +127,7 @@ export class QuickAddModal extends Modal {
         if (first) first.focus();
       }
     });
-    this.noteSearchEl.addEventListener("blur", (e) => {
+    this.noteSearchEl.addEventListener("blur", (_e) => {
       // Delay to allow click on dropdown item
       setTimeout(() => {
         if (!this.noteDropdownEl?.contains(document.activeElement)) {
@@ -146,7 +146,7 @@ export class QuickAddModal extends Modal {
     this.sectionSelectEl = sectionField.createEl("select", { cls: "tasklens-select tasklens-quickadd-section-select" });
     this.updateSectionOptions();
     this.sectionSelectEl.addEventListener("change", () => {
-      this.section = this.sectionSelectEl!.value;
+      this.section = this.sectionSelectEl?.value ?? "";
     });
 
     // Submit buttons
@@ -231,7 +231,8 @@ export class QuickAddModal extends Modal {
         if (e.key === "ArrowUp") {
           e.preventDefault();
           const prev = item.previousElementSibling as HTMLElement | null;
-          if (prev) prev.focus(); else this.noteSearchEl?.focus();
+          if (prev) prev.focus();
+          else this.noteSearchEl?.focus();
         }
         if (e.key === "Escape") this.closeNoteSearch();
       });
@@ -253,7 +254,7 @@ export class QuickAddModal extends Modal {
 
     const sections = this.store.getSectionsForFile(this.targetFile);
     if (sections.length === 0) {
-      const opt = this.sectionSelectEl.createEl("option", { value: "inbox", text: "inbox" });
+      const _opt = this.sectionSelectEl.createEl("option", { value: "inbox", text: "inbox" });
       this.section = "inbox";
     } else {
       for (const sec of sections) {
@@ -271,7 +272,8 @@ export class QuickAddModal extends Modal {
     }
 
     const parsed = parseNaturalLanguage(this.content);
-    const hasMetadata = parsed.dueDate || parsed.scheduledDate || parsed.startDate || parsed.priority !== 4 || parsed.labels.length > 0;
+    const hasMetadata =
+      parsed.dueDate || parsed.scheduledDate || parsed.startDate || parsed.priority !== 4 || parsed.labels.length > 0;
 
     if (!hasMetadata) {
       this.previewEl.style.display = "none";
@@ -287,13 +289,19 @@ export class QuickAddModal extends Modal {
     if (parsed.dueDate) {
       const dl = getDateLabel(parsed.dueDate);
       const timeStr = parsed.dueTime ? ` ${parsed.dueTime}` : "";
-      const chip = this.previewEl.createSpan({ cls: "tasklens-nlp-preview-chip", text: `📅 ${parsed.dueDate}${timeStr}` });
+      const chip = this.previewEl.createSpan({
+        cls: "tasklens-nlp-preview-chip",
+        text: `📅 ${parsed.dueDate}${timeStr}`,
+      });
       chip.style.color = dl.color;
     }
 
     if (parsed.scheduledDate) {
       const timeStr = parsed.scheduledTime ? ` ${parsed.scheduledTime}` : "";
-      const chip = this.previewEl.createSpan({ cls: "tasklens-nlp-preview-chip", text: `⏳ ${parsed.scheduledDate}${timeStr}` });
+      const chip = this.previewEl.createSpan({
+        cls: "tasklens-nlp-preview-chip",
+        text: `⏳ ${parsed.scheduledDate}${timeStr}`,
+      });
       chip.style.color = "#4fc3f7";
     }
 

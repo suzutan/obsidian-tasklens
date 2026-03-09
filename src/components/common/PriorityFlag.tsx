@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { Priority } from "../../models/Task";
+import type { Priority } from "../../models/Task";
 
 interface PriorityFlagProps {
   priority: Priority;

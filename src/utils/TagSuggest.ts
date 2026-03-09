@@ -18,11 +18,7 @@ export interface TagSuggestState {
  * Detect whether the cursor is inside a #tag token and return suggestions.
  * Returns null if not currently typing a tag.
  */
-export function getTagSuggestions(
-  text: string,
-  cursorPos: number,
-  allLabels: string[]
-): TagSuggestState | null {
+export function getTagSuggestions(text: string, cursorPos: number, allLabels: string[]): TagSuggestState | null {
   // Walk backward from cursor to find the nearest #
   let hashIndex = -1;
   for (let i = cursorPos - 1; i >= 0; i--) {
@@ -41,9 +37,7 @@ export function getTagSuggestions(
 
   const query = text.slice(hashIndex + 1, cursorPos).toLowerCase();
 
-  const suggestions = allLabels.filter(
-    (label) => label.toLowerCase().includes(query)
-  );
+  const suggestions = allLabels.filter((label) => label.toLowerCase().includes(query));
 
   if (suggestions.length === 0) return null;
 
@@ -57,7 +51,7 @@ export function applyTagSuggestion(
   text: string,
   cursorPos: number,
   state: TagSuggestState,
-  label: string
+  label: string,
 ): { text: string; newCursorPos: number } {
   const before = text.slice(0, state.hashIndex);
   const after = text.slice(cursorPos);

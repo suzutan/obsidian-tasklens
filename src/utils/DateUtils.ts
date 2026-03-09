@@ -10,14 +10,14 @@ export function formatDate(d: Date): string {
 }
 
 export function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + "T00:00:00");
+  const d = new Date(`${dateStr}T00:00:00`);
   d.setDate(d.getDate() + days);
   return formatDate(d);
 }
 
 export function daysBetween(a: string, b: string): number {
-  const da = new Date(a + "T00:00:00").getTime();
-  const db = new Date(b + "T00:00:00").getTime();
+  const da = new Date(`${a}T00:00:00`).getTime();
+  const db = new Date(`${b}T00:00:00`).getTime();
   return Math.round((db - da) / (1000 * 60 * 60 * 24));
 }
 
@@ -32,7 +32,7 @@ const DAY_NAMES_JA = ["日曜日", "月曜日", "火曜日", "水曜日", "木�
 export function getDateLabel(dueDate: string): DateLabel {
   const todayStr = today();
   const diff = daysBetween(todayStr, dueDate);
-  const d = new Date(dueDate + "T00:00:00");
+  const d = new Date(`${dueDate}T00:00:00`);
   const currentYear = new Date().getFullYear();
   const dateYear = d.getFullYear();
   const showYear = dateYear !== currentYear;

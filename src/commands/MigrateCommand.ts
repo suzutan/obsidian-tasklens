@@ -1,4 +1,4 @@
-import { App, Notice, TFile, TFolder } from "obsidian";
+import { type App, Notice, TFile, TFolder } from "obsidian";
 import { migrateFileContent } from "../parser/MigrationParser";
 
 export async function runMigration(app: App, taskFolder: string): Promise<void> {
@@ -43,7 +43,7 @@ export async function runMigration(app: App, taskFolder: string): Promise<void> 
 }
 
 function hasEmojiFormat(content: string): boolean {
-  return /[⏫🔼🔽📅⏳🔁✅]/.test(content);
+  return /[⏫🔼🔽📅⏳🔁✅]/u.test(content);
 }
 
 function collectMdFiles(folder: TFolder): TFile[] {
