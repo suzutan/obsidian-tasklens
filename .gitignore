@@ -2,3 +2,4 @@ node_modules/
 main.js
 dist/
 *.js.map
+coverage/
