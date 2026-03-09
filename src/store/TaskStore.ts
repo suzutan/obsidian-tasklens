@@ -99,7 +99,7 @@ export class TaskStore {
       case "custom_query":
         return this.runQuery(view.query);
       case "label": {
-        const q = `tag includes #${view.label}\nnot done\nsort by priority\nsort by due date`;
+        const q = `tag includes #${view.label}\nsort by priority\nsort by due date`;
         return this.runQuery(q);
       }
       case "source": {

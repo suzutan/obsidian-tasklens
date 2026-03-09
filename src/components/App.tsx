@@ -45,7 +45,7 @@ export function App({ store, fileWatcher, app, onSaveFilters }: AppProps) {
       case "custom_query":
         return currentView.query;
       case "label":
-        return `tag includes #${currentView.label}\nnot done\nsort by priority\nsort by due date`;
+        return `tag includes #${currentView.label}\nsort by priority\nsort by due date`;
       case "source":
         return `path includes ${currentView.path}\nnot done\nsort by priority`;
       default:
