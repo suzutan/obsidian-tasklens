@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.4.0...v0.5.0) (2026-03-09)
+
+
+### Features
+
+* add note mode with `* ` prefix for non-completable memo items ([#23](https://github.com/suzutan/obsidian-tasklens/issues/23)) ([511f37c](https://github.com/suzutan/obsidian-tasklens/commit/511f37ccb057cf4cc2c80f6cf382e59b094d4937))
+
 ## [0.4.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.3.0...v0.4.0) (2026-03-09)
 
 
