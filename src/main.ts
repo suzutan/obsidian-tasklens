@@ -4,6 +4,7 @@ import { TaskStore } from "./store/TaskStore";
 import { FileWatcher } from "./store/FileWatcher";
 import { TaskLensSettings, DEFAULT_SETTINGS, TaskLensSettingTab } from "./settings";
 import { QuickAddModal } from "./commands/QuickAddCommand";
+import { TimerGeneratorModal } from "./commands/TimerGeneratorCommand";
 
 export default class TaskLensPlugin extends Plugin {
   settings: TaskLensSettings = DEFAULT_SETTINGS;
@@ -45,6 +46,15 @@ export default class TaskLensPlugin extends Plugin {
       hotkeys: [{ modifiers: ["Ctrl", "Shift"], key: "a" }],
       callback: () => {
         new QuickAddModal(this.app, this.store, this.fileWatcher).open();
+      },
+    });
+
+    // Command: Timer Generator
+    this.addCommand({
+      id: "timer-generator",
+      name: "Timer Generator (スタミナ/定期増加)",
+      callback: () => {
+        new TimerGeneratorModal(this.app).open();
       },
     });
 
