@@ -1,32 +1,25 @@
 # TaskLens - Obsidian Task Management Plugin
 
-## プロジェクト概要
-
-Obsidian用のフルスクリーンタスク管理プラグイン。Vault内のMarkdownタスクを一元管理し、Obsidian Tasks互換フォーマットで動作する。
-
-- **GitHub**: `suzutan/obsidian-tasklens`
-- **ライセンス**: MIT
+Obsidian用フルスクリーンタスク管理プラグイン。Obsidian Tasks互換フォーマットで動作する。
 
 ## 技術スタック
 
-| 技術            | 用途                              |
-| --------------- | --------------------------------- |
-| TypeScript      | メイン言語                        |
-| Preact + JSX    | UIフレームワーク（Reactではない） |
-| @preact/signals | リアクティブ状態管理              |
-| esbuild         | バンドラー                        |
-| Obsidian API    | プラグインAPI                     |
+- **Preact + JSX**（Reactではない）— `jsxImportSource: "preact"`, esbuildで`react→preact/compat`エイリアス
+- **@preact/signals** — リアクティブ状態管理
+- **esbuild** — CJS形式でバンドル（Obsidian要件）
+- **TypeScript** — `strictNullChecks`, `noImplicitAny` 有効
 
-## ビルド & デプロイ
+## ビルド
 
 ```bash
-npm run build     # production build → main.js
-npm run dev       # watch mode（自動でvaultにコピー）
+npm run build     # production build → main.js（sourcemapなし）
+npm run dev       # watch mode（~/Documents/main/.obsidian/plugins/tasklens/ へ自動コピー）
 ```
 
-- ビルド成果物: `main.js`, `styles.css`, `manifest.json`
-- esbuild.config.mjsのcopyPluginがdev時にVaultのプラグインディレクトリへ自動コピーする
-- production buildの場合はVaultのプラグインディレクトリへ手動コピーが必要
+- **テスト・リント・CIは未導入**（`npm test`等は存在しない）
+- 成果物: `main.js`（バンドル）, `styles.css`（手書き）, `manifest.json`
+- `styles.css` はObsidian CSSカスタムプロパティ（`--text-normal`, `--background-primary`等）を使用
+- esbuildの外部モジュール: `obsidian`, `electron`, `@codemirror/*`, `@lezer/*`
 
 ## ディレクトリ構成
 
@@ -36,34 +29,21 @@ src/
 ├── settings.ts              # 設定、ビルトインフィルター定義
 ├── models/                  # データモデル (Task, Project, RecurrenceRule)
 ├── parser/                  # パーサー群
-│   ├── TaskParser.ts        # Obsidian Tasksフォーマット解析
-│   ├── TaskSerializer.ts    # Task → Markdown変換
+│   ├── TaskParser.ts        # Obsidian Tasksフォーマット → Task
+│   ├── TaskSerializer.ts    # Task → Markdown
 │   ├── NaturalLanguageParser.ts  # 自然言語入力（日本語対応）
 │   └── MigrationParser.ts   # 旧フォーマット移行
-├── query/                   # クエリエンジン
-│   ├── QueryParser.ts       # Obsidian Tasks互換クエリ構文パーサー
-│   └── QueryEngine.ts       # フィルタ/ソート/グループ実行
-├── store/                   # 状態管理
-│   ├── TaskStore.ts         # メインストア（signals）
-│   ├── FileWatcher.ts       # ファイル変更監視
-│   └── TaskIndex.ts         # タスクインデックス
-├── commands/                # コマンド
-│   ├── QuickAddCommand.ts   # Ctrl+Shift+A クイック追加モーダル
-│   └── MigrateCommand.ts    # 移行コマンド
+├── query/                   # Obsidian Tasks互換クエリエンジン
+├── store/                   # 状態管理（signals）、ファイル監視、インデックス
+├── commands/                # QuickAddCommand, MigrateCommand, TimerGeneratorCommand
 ├── components/              # Preact UIコンポーネント
-│   ├── App.tsx              # ルートコンポーネント
+│   ├── App.tsx              # ルート
 │   ├── sidebar/             # サイドバー（フィルター、ラベル、ソース）
-│   ├── content/             # メインコンテンツエリア
-│   ├── task/                # タスク表示・編集コンポーネント
-│   └── common/              # 共通コンポーネント（DatePicker, Timer等）
-├── utils/                   # ユーティリティ
-│   ├── DateUtils.ts         # 日付ヘルパー
-│   ├── FileUtils.ts         # ファイル操作
-│   ├── TagSuggest.ts        # タグ補完ロジック（QuickAdd/InlineAdd共用）
-│   └── TimerUtils.ts        # タイマー計算ロジック
-├── views/
-│   └── TaskLensView.ts      # Obsidian View
-└── dnd/                     # ドラッグ&ドロップ
+│   ├── content/             # メインコンテンツ（Inbox, Today, Filter, Project）
+│   ├── task/                # タスク表示・編集・詳細パネル
+│   └── common/              # DatePicker, TimerDisplay, EmojiPicker等
+├── utils/                   # DateUtils, FileUtils, TagSuggest, TimerUtils
+└── views/TaskLensView.ts    # Obsidian View
 ```
 
 ## Obsidian Tasks フォーマット（厳守）
@@ -94,7 +74,7 @@ src/
 
 ## NLP入力規則
 
-自然言語パーサー (`NaturalLanguageParser.ts`) のルール:
+`NaturalLanguageParser.ts` のルール:
 
 - **裸の日付**（`3/10`, `明日`, `来週月曜`）→ **予定日**（⏳ scheduledDate）
 - **`{}`で囲んだ日付**（`{2026-03-15}`, `{3/20 18:00}`）→ **期限**（📅 dueDate）
@@ -113,9 +93,7 @@ src/
 | `#stamina`           | 一定間隔で+1回復するリソース管理（ゲームスタミナ等）             |
 | `#periodic`          | 毎日決まった時刻に定量増加するリソース管理（デイリーボーナス等） |
 
-### リソースタイマー（独自拡張）
-
-スタミナ/定期増加はタスク行にインラインで絵文字フォーマットで記述:
+### リソースタイマー（独自拡張フォーマット）
 
 ```markdown
 - [ ] ゲームスタミナ #stamina ⚡ 120/200 🔄 432s 📌 2026-03-10T06:00:00Z
@@ -133,28 +111,15 @@ src/
 実装: `TimerUtils.ts`（計算）+ `TimerDisplay.tsx`（表示、1秒interval更新）
 詳細パネルでは値の調整ボタン（-1, -10, +10, リセット, MAX）を表示。
 
-## クエリパーサー
-
-Obsidian Tasks互換のクエリ構文。対応済み:
-
-- `done` / `not done`
-- `due today` / `due before today` / `due on YYYY-MM-DD`
-- `due before 7 days ago` / `due after in 3 days`（相対日付）
-- `has due date` / `no scheduled date`
-- `priority is highest` / `priority above low`
-- `path includes` / `description includes` / `tag includes`
-- `is recurring` / `is not recurring`
-- `AND` / `OR` / `NOT` / 括弧
-- `sort by` / `group by` / `limit`
-
 ## コミット規約
 
 - 機能ごとに分けてコミット
 - コミットメッセージは英語、conventional commits風
 
-## 注意事項
+## アーキテクチャ上の注意
 
-- QuickAddCommand.tsはPreactではなくvanilla DOM（Obsidian Modalを直接操作）
-- TagSuggest.tsはQuickAdd（DOM）とTaskInlineAdd（Preact）の両方で共用
+- `QuickAddCommand.ts` はPreactではなくvanilla DOM（Obsidian Modalを直接操作）
+- `TagSuggest.ts` はQuickAdd（DOM）とTaskInlineAdd（Preact）の両方で共用
 - サイドバーセクション（フィルター、ラベル、ソース）は折りたたみ可能（localStorageで状態保持）
 - ラベルビューは完了タスクも表示する（`not done`フィルターなし）
+- `QueryParser.ts` はObsidian Tasks互換クエリ構文を実装（対応構文はコード参照）
