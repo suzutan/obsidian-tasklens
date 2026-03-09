@@ -10,6 +10,8 @@ export default class TaskLensPlugin extends Plugin {
   settings: TaskLensSettings = DEFAULT_SETTINGS;
   store: TaskStore = new TaskStore();
   fileWatcher!: FileWatcher;
+  private lastSaveTime = 0;
+  private reloadTimer: ReturnType<typeof setTimeout> | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -66,6 +68,9 @@ export default class TaskLensPlugin extends Plugin {
       await this.fileWatcher.initialize();
     });
 
+    // Watch for external data.json changes (e.g. LiveSync)
+    this.watchDataJson();
+
     // Add ribbon icon
     this.addRibbonIcon("check-circle", "TaskLens", () => {
       this.activateView();
@@ -88,7 +93,7 @@ export default class TaskLensPlugin extends Plugin {
   }
 
   onunload(): void {
-    // Views are automatically cleaned up
+    if (this.reloadTimer) clearTimeout(this.reloadTimer);
   }
 
   async loadSettings(): Promise<void> {
@@ -96,7 +101,30 @@ export default class TaskLensPlugin extends Plugin {
   }
 
   async saveSettings(): Promise<void> {
+    this.lastSaveTime = Date.now();
     await this.saveData(this.settings);
+    this.applySettings();
+  }
+
+  private watchDataJson(): void {
+    const dataPath = `${this.manifest.dir}/data.json`;
+    this.registerEvent(
+      // @ts-expect-error "raw" event exists at runtime but is missing from obsidian.d.ts
+      this.app.vault.on("raw", (path: string) => {
+        if (path !== dataPath) return;
+        if (Date.now() - this.lastSaveTime < 2000) return;
+        if (this.reloadTimer) clearTimeout(this.reloadTimer);
+        this.reloadTimer = setTimeout(() => this.reloadExternalSettings(), 500);
+      }),
+    );
+  }
+
+  private async reloadExternalSettings(): Promise<void> {
+    await this.loadSettings();
+    this.applySettings();
+  }
+
+  private applySettings(): void {
     this.store.setCustomFilters(this.settings.filters);
     this.fileWatcher.updateConfig(this.settings.excludeFolders, this.settings.defaultTaskTarget);
   }
