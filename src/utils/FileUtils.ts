@@ -1,4 +1,4 @@
-import { App, TFile, TFolder } from "obsidian";
+import { type App, TFile, TFolder } from "obsidian";
 
 /**
  * Get all .md files in the vault, excluding specified folders.
@@ -14,7 +14,7 @@ function collectFiles(folder: TFolder, result: TFile[], excludeFolders: string[]
   for (const child of folder.children) {
     if (child instanceof TFolder) {
       // Check if this folder should be excluded
-      if (excludeFolders.some((ex) => child.path === ex || child.path.startsWith(ex + "/"))) {
+      if (excludeFolders.some((ex) => child.path === ex || child.path.startsWith(`${ex}/`))) {
         continue;
       }
       collectFiles(child, result, excludeFolders);
@@ -28,7 +28,7 @@ function collectFiles(folder: TFolder, result: TFile[], excludeFolders: string[]
  * Check if a file path is in an excluded folder.
  */
 export function isExcluded(filePath: string, excludeFolders: string[]): boolean {
-  return excludeFolders.some((ex) => filePath === ex || filePath.startsWith(ex + "/"));
+  return excludeFolders.some((ex) => filePath === ex || filePath.startsWith(`${ex}/`));
 }
 
 export function getFileName(file: TFile): string {

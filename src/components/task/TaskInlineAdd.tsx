@@ -1,10 +1,9 @@
-import { h } from "preact";
-import { useState, useCallback, useMemo, useRef } from "preact/hooks";
-import { FileWatcher } from "../../store/FileWatcher";
-import { TaskStore } from "../../store/TaskStore";
+import { useCallback, useMemo, useRef, useState } from "preact/hooks";
 import { parseNaturalLanguage } from "../../parser/NaturalLanguageParser";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
 import { getDateLabel } from "../../utils/DateUtils";
-import { getTagSuggestions, applyTagSuggestion, TagSuggestState } from "../../utils/TagSuggest";
+import { applyTagSuggestion, getTagSuggestions, type TagSuggestState } from "../../utils/TagSuggest";
 
 interface TaskInlineAddProps {
   fileWatcher: FileWatcher;
@@ -33,36 +32,48 @@ export function TaskInlineAdd({ fileWatcher, store, projectPath, section }: Task
     setTagState(null);
   }, [content, fileWatcher, projectPath, section]);
 
-  const updateTagSuggestions = useCallback((text: string) => {
-    const el = inputRef.current;
-    if (!el) { setTagState(null); return; }
-    const cursor = el.selectionStart ?? text.length;
-    const allLabels = store.allLabels.value;
-    const state = getTagSuggestions(text, cursor, allLabels);
-    setTagState(state);
-    setSelectedIdx(0);
-  }, [store]);
-
-  const handleInput = useCallback((e: Event) => {
-    const val = (e.target as HTMLInputElement).value;
-    setContent(val);
-    updateTagSuggestions(val);
-  }, [updateTagSuggestions]);
-
-  const selectTag = useCallback((label: string) => {
-    if (!tagState || !inputRef.current) return;
-    const cursor = inputRef.current.selectionStart ?? content.length;
-    const result = applyTagSuggestion(content, cursor, tagState, label);
-    setContent(result.text);
-    setTagState(null);
-    // Restore cursor position
-    requestAnimationFrame(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.setSelectionRange(result.newCursorPos, result.newCursorPos);
+  const updateTagSuggestions = useCallback(
+    (text: string) => {
+      const el = inputRef.current;
+      if (!el) {
+        setTagState(null);
+        return;
       }
-    });
-  }, [content, tagState]);
+      const cursor = el.selectionStart ?? text.length;
+      const allLabels = store.allLabels.value;
+      const state = getTagSuggestions(text, cursor, allLabels);
+      setTagState(state);
+      setSelectedIdx(0);
+    },
+    [store],
+  );
+
+  const handleInput = useCallback(
+    (e: Event) => {
+      const val = (e.target as HTMLInputElement).value;
+      setContent(val);
+      updateTagSuggestions(val);
+    },
+    [updateTagSuggestions],
+  );
+
+  const selectTag = useCallback(
+    (label: string) => {
+      if (!tagState || !inputRef.current) return;
+      const cursor = inputRef.current.selectionStart ?? content.length;
+      const result = applyTagSuggestion(content, cursor, tagState, label);
+      setContent(result.text);
+      setTagState(null);
+      // Restore cursor position
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(result.newCursorPos, result.newCursorPos);
+        }
+      });
+    },
+    [content, tagState],
+  );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -100,7 +111,7 @@ export function TaskInlineAdd({ fileWatcher, store, projectPath, section }: Task
         setTagState(null);
       }
     },
-    [handleAdd, tagState, selectedIdx, selectTag]
+    [handleAdd, tagState, selectedIdx, selectTag],
   );
 
   if (!editing) {
@@ -131,7 +142,6 @@ export function TaskInlineAdd({ fileWatcher, store, projectPath, section }: Task
             }, 150);
           }}
           placeholder="タスク名を入力（例: 買い物 {3/12 19:00} #countdown p1）"
-          autoFocus
         />
         {tagState && tagState.suggestions.length > 0 && (
           <div class="tasklens-tag-suggest-dropdown">
@@ -139,7 +149,10 @@ export function TaskInlineAdd({ fileWatcher, store, projectPath, section }: Task
               <div
                 key={label}
                 class={`tasklens-tag-suggest-item ${i === selectedIdx ? "tasklens-tag-suggest-item--active" : ""}`}
-                onMouseDown={(e) => { e.preventDefault(); selectTag(label); }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  selectTag(label);
+                }}
                 onMouseEnter={() => setSelectedIdx(i)}
               >
                 #{label}
@@ -148,41 +161,47 @@ export function TaskInlineAdd({ fileWatcher, store, projectPath, section }: Task
           </div>
         )}
       </div>
-      {parsed && (parsed.dueDate || parsed.scheduledDate || parsed.startDate || parsed.priority !== 4 || parsed.labels.length > 0) && (
-        <div class="tasklens-nlp-preview">
-          <span class="tasklens-nlp-preview-label">解析結果:</span>
-          <span class="tasklens-nlp-preview-content">{parsed.content}</span>
-          {parsed.dueDate && (
-            <span
-              class="tasklens-nlp-preview-chip"
-              style={{ color: getDateLabel(parsed.dueDate).color }}
-            >
-              📅 {parsed.dueDate}{parsed.dueTime ? ` ${parsed.dueTime}` : ""}
-            </span>
-          )}
-          {parsed.scheduledDate && (
-            <span class="tasklens-nlp-preview-chip" style={{ color: "#4fc3f7" }}>
-              ⏳ {parsed.scheduledDate}{parsed.scheduledTime ? ` ${parsed.scheduledTime}` : ""}
-            </span>
-          )}
-          {parsed.startDate && (
-            <span class="tasklens-nlp-preview-chip" style={{ color: "#808080" }}>
-              🛫 {parsed.startDate}{parsed.startTime ? ` ${parsed.startTime}` : ""}
-            </span>
-          )}
-          {parsed.priority !== 4 && (
-            <span class="tasklens-nlp-preview-chip">P{parsed.priority}</span>
-          )}
-          {parsed.labels.map((l) => (
-            <span key={l} class="tasklens-nlp-preview-chip">#{l}</span>
-          ))}
-        </div>
-      )}
+      {parsed &&
+        (parsed.dueDate ||
+          parsed.scheduledDate ||
+          parsed.startDate ||
+          parsed.priority !== 4 ||
+          parsed.labels.length > 0) && (
+          <div class="tasklens-nlp-preview">
+            <span class="tasklens-nlp-preview-label">解析結果:</span>
+            <span class="tasklens-nlp-preview-content">{parsed.content}</span>
+            {parsed.dueDate && (
+              <span class="tasklens-nlp-preview-chip" style={{ color: getDateLabel(parsed.dueDate).color }}>
+                📅 {parsed.dueDate}
+                {parsed.dueTime ? ` ${parsed.dueTime}` : ""}
+              </span>
+            )}
+            {parsed.scheduledDate && (
+              <span class="tasklens-nlp-preview-chip" style={{ color: "#4fc3f7" }}>
+                ⏳ {parsed.scheduledDate}
+                {parsed.scheduledTime ? ` ${parsed.scheduledTime}` : ""}
+              </span>
+            )}
+            {parsed.startDate && (
+              <span class="tasklens-nlp-preview-chip" style={{ color: "#808080" }}>
+                🛫 {parsed.startDate}
+                {parsed.startTime ? ` ${parsed.startTime}` : ""}
+              </span>
+            )}
+            {parsed.priority !== 4 && <span class="tasklens-nlp-preview-chip">P{parsed.priority}</span>}
+            {parsed.labels.map((l) => (
+              <span key={l} class="tasklens-nlp-preview-chip">
+                #{l}
+              </span>
+            ))}
+          </div>
+        )}
       <div class="tasklens-inline-add-actions">
-        <button class="tasklens-btn tasklens-btn-primary" onClick={handleAdd}>
+        <button type="button" class="tasklens-btn tasklens-btn-primary" onClick={handleAdd}>
           追加
         </button>
         <button
+          type="button"
           class="tasklens-btn"
           onClick={() => {
             setEditing(false);

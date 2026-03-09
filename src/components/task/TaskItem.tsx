@@ -1,13 +1,14 @@
-import { h, VNode } from "preact";
-import { useRef, useMemo } from "preact/hooks";
-import { Task } from "../../models/Task";
-import { TaskCheckbox } from "./TaskCheckbox";
+import type { App as ObsidianApp } from "obsidian";
+import type { VNode } from "preact";
+import { useMemo, useRef } from "preact/hooks";
+import type { Task } from "../../models/Task";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
 import { DateChip } from "../common/DateChip";
 import { LabelBadge } from "../common/LabelBadge";
 import { PriorityFlag } from "../common/PriorityFlag";
 import { TimerDisplay } from "../common/TimerDisplay";
-import { TaskStore } from "../../store/TaskStore";
-import { FileWatcher } from "../../store/FileWatcher";
+import { TaskCheckbox } from "./TaskCheckbox";
 
 interface TaskItemProps {
   task: Task;
@@ -35,9 +36,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
     store.selectTask(isSelected ? null : task.id);
   };
 
-  const projectName = showProject
-    ? task.projectPath.replace(/\.md$/, "").split("/").pop()
-    : null;
+  const projectName = showProject ? task.projectPath.replace(/\.md$/, "").split("/").pop() : null;
 
   return (
     <div
@@ -89,34 +88,31 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
       }}
     >
       <div class="tasklens-task-drag-handle">⠿</div>
-      <TaskCheckbox
-        priority={task.priority}
-        completed={task.completed}
-        onChange={handleToggle}
-      />
+      <TaskCheckbox priority={task.priority} completed={task.completed} onChange={handleToggle} />
       <div class="tasklens-task-content">
         <span class={`tasklens-task-text ${task.completed ? "tasklens-task-text--done" : ""}`}>
           <RenderContent text={task.content} />
         </span>
         <div class="tasklens-task-meta">
-          {task.dueDate && (
-            <DateChip dueDate={task.dueDate} dueTime={task.dueTime} recurrence={task.recurrence} />
-          )}
+          {task.dueDate && <DateChip dueDate={task.dueDate} dueTime={task.dueTime} recurrence={task.recurrence} />}
           {task.scheduledDate && (
             <span class="tasklens-date-chip" style={{ color: "#4fc3f7" }}>
-              ⏳ {task.scheduledDate}{task.scheduledTime ? ` ${task.scheduledTime}` : ""}
+              ⏳ {task.scheduledDate}
+              {task.scheduledTime ? ` ${task.scheduledTime}` : ""}
             </span>
           )}
           {task.startDate && (
             <span class="tasklens-date-chip" style={{ color: "#808080" }}>
-              🛫 {task.startDate}{task.startTime ? ` ${task.startTime}` : ""}
+              🛫 {task.startDate}
+              {task.startTime ? ` ${task.startTime}` : ""}
             </span>
           )}
           {task.location && (
             <span
               class={`tasklens-location-chip ${getLocationUrl(task.location) ? "tasklens-location-chip--link" : ""}`}
               onClick={(e: MouseEvent) => {
-                const url = getLocationUrl(task.location!);
+                if (!task.location) return;
+                const url = getLocationUrl(task.location);
                 if (url) {
                   e.stopPropagation();
                   window.open(url, "_blank");
@@ -130,9 +126,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
           {task.labels.map((label) => (
             <LabelBadge key={label} label={label} />
           ))}
-          {showProject && projectName && (
-            <span class="tasklens-task-project">{projectName}</span>
-          )}
+          {showProject && projectName && <span class="tasklens-task-project">{projectName}</span>}
         </div>
       </div>
       <PriorityFlag priority={task.priority} />
@@ -155,9 +149,13 @@ function getLocationUrl(loc: string): string | null {
 /** Shorten a location value for chip display */
 function formatLocationShort(loc: string): string {
   if (/^https?:\/\//.test(loc)) {
-    try { return new URL(loc).hostname; } catch { return loc.slice(0, 20); }
+    try {
+      return new URL(loc).hostname;
+    } catch {
+      return loc.slice(0, 20);
+    }
   }
-  if (loc.length > 20) return loc.slice(0, 20) + "…";
+  if (loc.length > 20) return `${loc.slice(0, 20)}…`;
   return loc;
 }
 
@@ -171,9 +169,9 @@ export function RenderContent({ text }: { text: string }) {
     // Match markdown links [text](url) and wiki-links [[target]] or [[target|alias]]
     const re = /\[([^\]]*)\]\((https?:\/\/[^)]+)\)|\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
     let lastIndex = 0;
-    let match: RegExpExecArray | null;
+    let match: RegExpExecArray | null = re.exec(text);
 
-    while ((match = re.exec(text)) !== null) {
+    while (match !== null) {
       // Add text before match
       if (match.index > lastIndex) {
         result.push(text.slice(lastIndex, match.index));
@@ -193,7 +191,7 @@ export function RenderContent({ text }: { text: string }) {
             }}
           >
             {match[1] || url}
-          </a>
+          </a>,
         );
       } else if (match[3]) {
         // Wiki-link: [[target]] or [[target|alias]]
@@ -205,7 +203,7 @@ export function RenderContent({ text }: { text: string }) {
             onClick={(e: MouseEvent) => {
               e.stopPropagation();
               // Open the note in Obsidian via the global app
-              const app = (window as any).app;
+              const app = (window as unknown as { app: ObsidianApp }).app;
               if (app) {
                 const file = app.metadataCache.getFirstLinkpathDest(target, "");
                 if (file) {
@@ -215,11 +213,12 @@ export function RenderContent({ text }: { text: string }) {
             }}
           >
             {alias}
-          </span>
+          </span>,
         );
       }
 
       lastIndex = match.index + match[0].length;
+      match = re.exec(text);
     }
 
     // Add remaining text

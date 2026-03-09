@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { parseRecurrence, serializeRecurrence, getNextDueDate, recurrenceToDisplayText } from "./RecurrenceRule";
+import { describe, expect, it } from "vitest";
+import { getNextDueDate, parseRecurrence, recurrenceToDisplayText, serializeRecurrence } from "./RecurrenceRule";
 
 describe("parseRecurrence", () => {
   describe("natural language format", () => {

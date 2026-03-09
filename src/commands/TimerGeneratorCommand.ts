@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from "obsidian";
+import { Modal, Setting } from "obsidian";
 
 /**
  * Modal to generate stamina or periodic-increment timer task lines.
@@ -17,39 +17,31 @@ export class TimerGeneratorModal extends Modal {
   // Output
   private outputEl: HTMLTextAreaElement | null = null;
 
-  constructor(app: App) {
-    super(app);
-  }
-
   onOpen(): void {
     const { contentEl } = this;
     contentEl.addClass("tasklens-timer-generator");
     contentEl.createEl("h2", { text: "タイマータスク生成" });
 
     // Timer type selector
-    new Setting(contentEl)
-      .setName("タイマー種別")
-      .addDropdown((dd) => {
-        dd.addOption("stamina", "⚡ スタミナ（一定間隔回復）");
-        dd.addOption("periodic", "📈 定期増加（時刻指定）");
-        dd.setValue(this.timerType);
-        dd.onChange((v) => {
-          this.timerType = v as "stamina" | "periodic";
-          this.renderFields();
-          this.updateOutput();
-        });
+    new Setting(contentEl).setName("タイマー種別").addDropdown((dd) => {
+      dd.addOption("stamina", "⚡ スタミナ（一定間隔回復）");
+      dd.addOption("periodic", "📈 定期増加（時刻指定）");
+      dd.setValue(this.timerType);
+      dd.onChange((v) => {
+        this.timerType = v as "stamina" | "periodic";
+        this.renderFields();
+        this.updateOutput();
       });
+    });
 
     // Task name
-    new Setting(contentEl)
-      .setName("タスク名")
-      .addText((t) => {
-        t.setPlaceholder("例: Arknights スタミナ");
-        t.onChange((v) => {
-          this.taskName = v;
-          this.updateOutput();
-        });
+    new Setting(contentEl).setName("タスク名").addText((t) => {
+      t.setPlaceholder("例: Arknights スタミナ");
+      t.onChange((v) => {
+        this.taskName = v;
+        this.updateOutput();
       });
+    });
 
     // Dynamic fields container
     const fieldsEl = contentEl.createDiv({ cls: "tasklens-tg-fields" });
@@ -90,29 +82,25 @@ export class TimerGeneratorModal extends Modal {
 
   private renderFieldsInto(el: HTMLElement): void {
     // Common: current value and max value
-    new Setting(el)
-      .setName("現在値")
-      .addText((t) => {
-        t.setValue(String(this.currentValue));
-        t.inputEl.type = "number";
-        t.inputEl.min = "0";
-        t.onChange((v) => {
-          this.currentValue = parseInt(v) || 0;
-          this.updateOutput();
-        });
+    new Setting(el).setName("現在値").addText((t) => {
+      t.setValue(String(this.currentValue));
+      t.inputEl.type = "number";
+      t.inputEl.min = "0";
+      t.onChange((v) => {
+        this.currentValue = parseInt(v, 10) || 0;
+        this.updateOutput();
       });
+    });
 
-    new Setting(el)
-      .setName("最大値")
-      .addText((t) => {
-        t.setValue(String(this.maxValue));
-        t.inputEl.type = "number";
-        t.inputEl.min = "1";
-        t.onChange((v) => {
-          this.maxValue = parseInt(v) || 1;
-          this.updateOutput();
-        });
+    new Setting(el).setName("最大値").addText((t) => {
+      t.setValue(String(this.maxValue));
+      t.inputEl.type = "number";
+      t.inputEl.min = "1";
+      t.onChange((v) => {
+        this.maxValue = parseInt(v, 10) || 1;
+        this.updateOutput();
       });
+    });
 
     if (this.timerType === "stamina") {
       // Recovery interval
@@ -124,7 +112,7 @@ export class TimerGeneratorModal extends Modal {
           t.inputEl.type = "number";
           t.inputEl.min = "1";
           t.onChange((v) => {
-            this.intervalSeconds = parseInt(v) || 60;
+            this.intervalSeconds = parseInt(v, 10) || 60;
             this.updateOutput();
           });
         });
@@ -155,7 +143,7 @@ export class TimerGeneratorModal extends Modal {
           t.inputEl.type = "number";
           t.inputEl.min = "1";
           t.onChange((v) => {
-            this.incrementAmount = parseInt(v) || 1;
+            this.incrementAmount = parseInt(v, 10) || 1;
             this.updateOutput();
           });
         });

@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { migrateLine, migrateFileContent } from "./MigrationParser";
+import { describe, expect, it } from "vitest";
+import { migrateFileContent, migrateLine } from "./MigrationParser";
 
 describe("migrateLine", () => {
   it("converts priority p1", () => {
@@ -39,7 +39,8 @@ describe("migrateLine", () => {
   });
 
   it("converts complex line with all fields", () => {
-    const input = "- [ ] タスク名 (p1, due:2026-03-31, scheduled:2026-03-01, start:2026-02-01, repeat:monthly/1, #label)";
+    const input =
+      "- [ ] タスク名 (p1, due:2026-03-31, scheduled:2026-03-01, start:2026-02-01, repeat:monthly/1, #label)";
     const result = migrateLine(input);
     expect(result).toContain("⏫");
     expect(result).toContain("📅 2026-03-31");

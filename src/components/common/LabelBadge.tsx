@@ -1,5 +1,3 @@
-import { h } from "preact";
-
 interface LabelBadgeProps {
   label: string;
   onClick?: () => void;

@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { type App, PluginSettingTab, Setting } from "obsidian";
 import type TaskLensPlugin from "./main";
 
 export interface FilterDefinition {
@@ -82,7 +82,16 @@ sort by due date`,
 ];
 
 export const DEFAULT_SETTINGS: TaskLensSettings = {
-  excludeFolders: [".obsidian", ".trash", ".claude", ".github", "_Templates", "attachments", "_backup_tasks_migration", "_claude_docs"],
+  excludeFolders: [
+    ".obsidian",
+    ".trash",
+    ".claude",
+    ".github",
+    "_Templates",
+    "attachments",
+    "_backup_tasks_migration",
+    "_claude_docs",
+  ],
   defaultTaskTarget: "tasks/inbox.md",
   filters: [],
 };
@@ -114,7 +123,7 @@ export class TaskLensSettingTab extends PluginSettingTab {
               .map((s) => s.trim())
               .filter(Boolean);
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -127,7 +136,7 @@ export class TaskLensSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.defaultTaskTarget = value;
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     // Custom filters section
@@ -135,15 +144,15 @@ export class TaskLensSettingTab extends PluginSettingTab {
 
     for (let i = 0; i < this.plugin.settings.filters.length; i++) {
       const filter = this.plugin.settings.filters[i];
-      const s = new Setting(containerEl)
+      const _s = new Setting(containerEl)
         .setName(filter.name)
-        .setDesc(filter.query.split("\n")[0] + "...")
+        .setDesc(`${filter.query.split("\n")[0]}...`)
         .addButton((btn) =>
           btn.setButtonText("削除").onClick(async () => {
             this.plugin.settings.filters.splice(i, 1);
             await this.plugin.saveSettings();
             this.display();
-          })
+          }),
         );
     }
   }

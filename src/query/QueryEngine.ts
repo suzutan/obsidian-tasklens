@@ -1,14 +1,6 @@
-import { Task, Priority } from "../models/Task";
-import {
-  FilterNode,
-  ParsedQuery,
-  SortRule,
-  GroupField,
-  PriorityLevel,
-  DateField,
-  DateOp,
-} from "./QueryParser";
-import { today, formatDate } from "../utils/DateUtils";
+import type { Priority, Task } from "../models/Task";
+import { today } from "../utils/DateUtils";
+import type { DateField, DateOp, FilterNode, GroupField, ParsedQuery, PriorityLevel, SortRule } from "./QueryParser";
 
 /**
  * Evaluate a parsed query against a list of tasks.
@@ -19,7 +11,8 @@ export function executeQuery(tasks: Task[], query: ParsedQuery): Task[] {
 
   // Filter
   if (query.filter) {
-    result = result.filter((t) => evaluateFilter(t, query.filter!));
+    const filter = query.filter;
+    result = result.filter((t) => evaluateFilter(t, filter));
   }
 
   // Sort
@@ -38,10 +31,7 @@ export function executeQuery(tasks: Task[], query: ParsedQuery): Task[] {
 /**
  * Group tasks by specified field. Returns ordered entries.
  */
-export function groupTasks(
-  tasks: Task[],
-  groupBy: GroupField[]
-): { key: string; tasks: Task[] }[] {
+export function groupTasks(tasks: Task[], groupBy: GroupField[]): { key: string; tasks: Task[] }[] {
   if (groupBy.length === 0) {
     return [{ key: "", tasks }];
   }
@@ -54,7 +44,7 @@ export function groupTasks(
     const keys = getGroupKeys(task, field);
     for (const key of keys) {
       if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(task);
+      groups.get(key)?.push(task);
     }
   }
 
@@ -71,7 +61,7 @@ export function groupTasks(
     return a.localeCompare(b);
   });
 
-  return sortedKeys.map((key) => ({ key, tasks: groups.get(key)! }));
+  return sortedKeys.map((key) => ({ key, tasks: groups.get(key) ?? [] }));
 }
 
 function getGroupKeys(task: Task, field: GroupField): string[] {
@@ -99,10 +89,14 @@ function getGroupKeys(task: Task, field: GroupField): string[] {
 
 function priorityLabel(p: Priority): string {
   switch (p) {
-    case 1: return "⏫ Highest";
-    case 2: return "🔼 High";
-    case 3: return "🔽 Low";
-    case 4: return "Normal";
+    case 1:
+      return "⏫ Highest";
+    case 2:
+      return "🔼 High";
+    case 3:
+      return "🔽 Low";
+    case 4:
+      return "Normal";
   }
 }
 
@@ -158,19 +152,18 @@ function evaluateFilter(task: Task, node: FilterNode): boolean {
 
 function getDateValue(task: Task, field: DateField): string | null {
   switch (field) {
-    case "due": return task.dueDate;
-    case "scheduled": return task.scheduledDate;
-    case "start": return task.startDate;
-    case "done": return task.doneDate;
+    case "due":
+      return task.dueDate;
+    case "scheduled":
+      return task.scheduledDate;
+    case "start":
+      return task.startDate;
+    case "done":
+      return task.doneDate;
   }
 }
 
-function evaluateDateFilter(
-  task: Task,
-  field: DateField,
-  op: DateOp,
-  value: string
-): boolean {
+function evaluateDateFilter(task: Task, field: DateField, op: DateOp, value: string): boolean {
   const dateVal = getDateValue(task, field);
   const todayStr = today();
 
@@ -192,11 +185,16 @@ function evaluateDateFilter(
 
 function priorityLevelToNumber(level: PriorityLevel): Priority {
   switch (level) {
-    case "highest": return 1;
-    case "high": return 2;
-    case "medium": return 3;
-    case "low": return 3;
-    case "none": return 4;
+    case "highest":
+      return 1;
+    case "high":
+      return 2;
+    case "medium":
+      return 3;
+    case "low":
+      return 3;
+    case "none":
+      return 4;
   }
 }
 

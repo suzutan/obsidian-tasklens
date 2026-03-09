@@ -10,7 +10,7 @@ export function migrateLine(line: string): string {
   if (!match) return line;
 
   const prefix = match[1];
-  let content = match[2];
+  const content = match[2];
 
   // Extract parenthesized metadata at the end
   const metaMatch = content.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
@@ -18,7 +18,10 @@ export function migrateLine(line: string): string {
 
   const taskContent = metaMatch[1].trim();
   const metaStr = metaMatch[2];
-  const metaParts = metaStr.split(",").map((s) => s.trim()).filter(Boolean);
+  const metaParts = metaStr
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const emojiParts: string[] = [];
   const tags: string[] = [];
@@ -64,23 +67,28 @@ function convertCompactRecurrence(compact: string): string {
   const type = parts[0];
 
   const WEEKDAY_FULL: Record<string, string> = {
-    sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday",
-    thu: "Thursday", fri: "Friday", sat: "Saturday",
+    sun: "Sunday",
+    mon: "Monday",
+    tue: "Tuesday",
+    wed: "Wednesday",
+    thu: "Thursday",
+    fri: "Friday",
+    sat: "Saturday",
   };
 
   switch (type) {
     case "daily":
       if (parts[1]) {
-        const n = parseInt(parts[1]);
-        if (!isNaN(n) && n > 1) return `every ${n} days`;
+        const n = parseInt(parts[1], 10);
+        if (!Number.isNaN(n) && n > 1) return `every ${n} days`;
       }
       return "every day";
     case "weekly": {
       let interval = 1;
       let dayName = "";
       if (parts[1]) {
-        const n = parseInt(parts[1]);
-        if (!isNaN(n)) {
+        const n = parseInt(parts[1], 10);
+        if (!Number.isNaN(n)) {
           interval = n;
           if (parts[2]) dayName = parts[2];
         } else {
@@ -95,17 +103,17 @@ function convertCompactRecurrence(compact: string): string {
       return base;
     }
     case "monthly": {
-      let interval = 1;
+      const interval = 1;
       let day = "";
       if (parts[1]) {
-        const n = parseInt(parts[1]);
-        if (!isNaN(n) && n <= 31) {
+        const n = parseInt(parts[1], 10);
+        if (!Number.isNaN(n) && n <= 31) {
           day = parts[1];
         }
       }
       let base = interval > 1 ? `every ${interval} months` : "every month";
       if (day) {
-        const d = parseInt(day);
+        const d = parseInt(day, 10);
         const s = ["th", "st", "nd", "rd"];
         const v = d % 100;
         const ord = d + (s[(v - 20) % 10] || s[v] || s[0]);

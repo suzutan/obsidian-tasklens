@@ -1,11 +1,10 @@
-import { h } from "preact";
 import { useMemo } from "preact/hooks";
-import { TaskStore } from "../../store/TaskStore";
-import { FileWatcher } from "../../store/FileWatcher";
-import { TaskList } from "../task/TaskList";
-import { parseQuery } from "../../query/QueryParser";
 import { executeQuery, groupTasks } from "../../query/QueryEngine";
+import { parseQuery } from "../../query/QueryParser";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
 import { today } from "../../utils/DateUtils";
+import { TaskList } from "../task/TaskList";
 
 interface FilterContentProps {
   store: TaskStore;
@@ -21,18 +20,12 @@ export function FilterContent({ store, fileWatcher, title, query }: FilterConten
 
   const parsed = useMemo(() => parseQuery(query), [query]);
 
-  const filteredTasks = useMemo(
-    () => executeQuery(allTasks, parsed),
-    [allTasks, parsed]
-  );
+  const filteredTasks = useMemo(() => executeQuery(allTasks, parsed), [allTasks, parsed]);
 
-  const groups = useMemo(
-    () => groupTasks(filteredTasks, parsed.group),
-    [filteredTasks, parsed.group]
-  );
+  const groups = useMemo(() => groupTasks(filteredTasks, parsed.group), [filteredTasks, parsed.group]);
 
   const todayStr = today();
-  const d = new Date(todayStr + "T00:00:00");
+  const d = new Date(`${todayStr}T00:00:00`);
   const dateDisplay = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${DAY_NAMES_JA[d.getDay()]}曜日`;
 
   return (
@@ -50,12 +43,7 @@ export function FilterContent({ store, fileWatcher, title, query }: FilterConten
 
       {groups.length === 1 && !groups[0].key ? (
         // No grouping — single list
-        <TaskList
-          tasks={filteredTasks}
-          store={store}
-          fileWatcher={fileWatcher}
-          showProject
-        />
+        <TaskList tasks={filteredTasks} store={store} fileWatcher={fileWatcher} showProject />
       ) : (
         // Grouped display
         groups.map((group) => (
@@ -64,12 +52,7 @@ export function FilterContent({ store, fileWatcher, title, query }: FilterConten
               <span class="tasklens-section-title">{group.key}</span>
               <span class="tasklens-section-count">{group.tasks.length}</span>
             </div>
-            <TaskList
-              tasks={group.tasks}
-              store={store}
-              fileWatcher={fileWatcher}
-              showProject
-            />
+            <TaskList tasks={group.tasks} store={store} fileWatcher={fileWatcher} showProject />
           </div>
         ))
       )}

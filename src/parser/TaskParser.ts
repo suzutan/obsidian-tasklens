@@ -1,5 +1,5 @@
-import { Task, Priority, getDefaultTask, createTaskId, TimerConfig } from "../models/Task";
 import { parseRecurrence } from "../models/RecurrenceRule";
+import { getDefaultTask, type Task } from "../models/Task";
 
 /**
  * Parse a single task line in Obsidian Tasks emoji format:
@@ -10,7 +10,7 @@ export function parseTaskLine(
   projectPath: string,
   section: string,
   order: number,
-  indent: number = 0
+  indent: number = 0,
 ): Task | null {
   // Match checkbox pattern: - [ ] or - [x]
   const match = line.match(/^(\s*)- \[([ x])\]\s+(.+)$/);
@@ -80,9 +80,9 @@ export function parseTaskLine(
   if (staminaMatch) {
     task.timerConfig = {
       type: "stamina",
-      currentValue: parseInt(staminaMatch[1]),
-      maxValue: parseInt(staminaMatch[2]),
-      recoveryIntervalSeconds: parseInt(staminaMatch[3]),
+      currentValue: parseInt(staminaMatch[1], 10),
+      maxValue: parseInt(staminaMatch[2], 10),
+      recoveryIntervalSeconds: parseInt(staminaMatch[3], 10),
       lastUpdatedAt: staminaMatch[4] || new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
     };
     rawContent = rawContent.replace(/\s*⚡\s*\d+\/\d+\s*🔄\s*\d+s(?:\s*📌\s*\S+)?\s*/g, " ");
@@ -94,9 +94,9 @@ export function parseTaskLine(
   if (periodicMatch) {
     task.timerConfig = {
       type: "periodic",
-      currentValue: parseInt(periodicMatch[1]),
-      maxValue: parseInt(periodicMatch[2]),
-      incrementAmount: periodicMatch[3] ? parseInt(periodicMatch[3]) : 1,
+      currentValue: parseInt(periodicMatch[1], 10),
+      maxValue: parseInt(periodicMatch[2], 10),
+      incrementAmount: periodicMatch[3] ? parseInt(periodicMatch[3], 10) : 1,
       scheduleTimes: periodicMatch[4].split(","),
       lastUpdatedAt: periodicMatch[5] || new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
     };
@@ -105,9 +105,10 @@ export function parseTaskLine(
 
   // Labels/tags: #tag (but not inside words)
   const tagRegex = /(?:^|\s)#(\S+)/g;
-  let tagMatch;
-  while ((tagMatch = tagRegex.exec(rawContent)) !== null) {
+  let tagMatch: RegExpExecArray | null = tagRegex.exec(rawContent);
+  while (tagMatch !== null) {
     task.labels.push(tagMatch[1]);
+    tagMatch = tagRegex.exec(rawContent);
   }
   rawContent = rawContent.replace(/(?:^|\s)#\S+/g, " ");
 
@@ -126,7 +127,7 @@ export function parseTaskLine(
 }
 
 export interface ParsedFile {
-  frontmatter: Record<string, any>;
+  frontmatter: Record<string, unknown>;
   sections: Map<string, Task[]>;
   sectionOrder: string[];
   rawLines: string[];
@@ -139,11 +140,11 @@ export function parseTaskFile(content: string, projectPath: string): ParsedFile 
   const lines = content.split("\n");
   const sections = new Map<string, Task[]>();
   const sectionOrder: string[] = [];
-  let frontmatter: Record<string, any> = {};
+  let frontmatter: Record<string, unknown> = {};
   let currentSection = "";
   let inFrontmatter = false;
-  let frontmatterDone = false;
-  let frontmatterLines: string[] = [];
+  let _frontmatterDone = false;
+  const frontmatterLines: string[] = [];
   let taskOrder = 0;
 
   for (let i = 0; i < lines.length; i++) {
@@ -157,7 +158,7 @@ export function parseTaskFile(content: string, projectPath: string): ParsedFile 
     if (inFrontmatter) {
       if (line.trim() === "---") {
         inFrontmatter = false;
-        frontmatterDone = true;
+        _frontmatterDone = true;
         frontmatter = parseFrontmatter(frontmatterLines);
         continue;
       }
@@ -190,7 +191,7 @@ export function parseTaskFile(content: string, projectPath: string): ParsedFile 
         sections.set(currentSection, []);
         sectionOrder.push(currentSection);
       }
-      sections.get(currentSection)!.push(task);
+      sections.get(currentSection)?.push(task);
       taskOrder++;
       continue;
     }
@@ -208,22 +209,22 @@ export function parseTaskFile(content: string, projectPath: string): ParsedFile 
   return { frontmatter, sections, sectionOrder, rawLines: lines };
 }
 
-function parseFrontmatter(lines: string[]): Record<string, any> {
-  const result: Record<string, any> = {};
+function parseFrontmatter(lines: string[]): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   for (const line of lines) {
     const match = line.match(/^(\w+):\s*(.+)?$/);
     if (match) {
       const key = match[1];
-      let value: any = match[2]?.trim();
-      if (value === undefined) value = "";
+      const rawValue: string = match[2]?.trim() ?? "";
       // Handle array notation [a, b]
-      if (value.startsWith("[") && value.endsWith("]")) {
-        value = value
+      if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
+        result[key] = rawValue
           .slice(1, -1)
           .split(",")
           .map((s: string) => s.trim());
+      } else {
+        result[key] = rawValue;
       }
-      result[key] = value;
     }
   }
   return result;

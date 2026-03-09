@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parseQuery } from "./QueryParser";
 
 beforeEach(() => {
@@ -156,28 +156,28 @@ describe("parseQuery", () => {
   describe("filter: boolean combinators", () => {
     it("parses AND", () => {
       const result = parseQuery("(not done) AND (has due date)");
-      expect(result.filter!.type).toBe("and");
+      expect(result.filter?.type).toBe("and");
     });
 
     it("parses OR", () => {
       const result = parseQuery("(due today) OR (due before today)");
-      expect(result.filter!.type).toBe("or");
+      expect(result.filter?.type).toBe("or");
     });
 
     it("parses NOT", () => {
       const result = parseQuery("NOT (done)");
-      expect(result.filter!.type).toBe("not");
+      expect(result.filter?.type).toBe("not");
     });
   });
 
   describe("multiple filter lines are ANDed", () => {
     it("combines two filter lines with AND", () => {
       const result = parseQuery("not done\nhas due date");
-      expect(result.filter!.type).toBe("and");
-      if (result.filter!.type === "and") {
+      expect(result.filter?.type).toBe("and");
+      if (result.filter?.type === "and") {
         // "not done" is parsed as NOT(done) by the tokenizer
-        expect(result.filter!.left).toEqual({ type: "not", child: { type: "done" } });
-        expect(result.filter!.right).toEqual({ type: "has_date", field: "due" });
+        expect(result.filter?.left).toEqual({ type: "not", child: { type: "done" } });
+        expect(result.filter?.right).toEqual({ type: "has_date", field: "due" });
       }
     });
   });
@@ -232,13 +232,7 @@ describe("parseQuery", () => {
 
   describe("combined query", () => {
     it("parses filter + sort + group + limit", () => {
-      const query = [
-        "not done",
-        "has due date",
-        "sort by due date",
-        "group by filename",
-        "limit 20",
-      ].join("\n");
+      const query = ["not done", "has due date", "sort by due date", "group by filename", "limit 20"].join("\n");
 
       const result = parseQuery(query);
       expect(result.filter).not.toBeNull();

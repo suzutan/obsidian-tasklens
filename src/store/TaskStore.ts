@@ -1,9 +1,9 @@
-import { signal, computed, batch, Signal } from "@preact/signals";
-import { Task, Priority, createTaskId } from "../models/Task";
+import { batch, computed, type Signal, signal } from "@preact/signals";
+import type { Task } from "../models/Task";
+import { executeQuery } from "../query/QueryEngine";
+import { parseQuery } from "../query/QueryParser";
+import { BUILT_IN_FILTERS, type FilterDefinition } from "../settings";
 import { today } from "../utils/DateUtils";
-import { parseQuery, ParsedQuery } from "../query/QueryParser";
-import { executeQuery, groupTasks } from "../query/QueryEngine";
-import { FilterDefinition, BUILT_IN_FILTERS } from "../settings";
 
 export class TaskStore {
   /** All tasks indexed by ID */

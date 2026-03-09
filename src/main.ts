@@ -1,10 +1,10 @@
 import { Plugin } from "obsidian";
-import { TaskLensView, VIEW_TYPE_TASKLENS } from "./views/TaskLensView";
-import { TaskStore } from "./store/TaskStore";
-import { FileWatcher } from "./store/FileWatcher";
-import { TaskLensSettings, DEFAULT_SETTINGS, TaskLensSettingTab } from "./settings";
 import { QuickAddModal } from "./commands/QuickAddCommand";
 import { TimerGeneratorModal } from "./commands/TimerGeneratorCommand";
+import { DEFAULT_SETTINGS, type TaskLensSettings, TaskLensSettingTab } from "./settings";
+import { FileWatcher } from "./store/FileWatcher";
+import { TaskStore } from "./store/TaskStore";
+import { TaskLensView, VIEW_TYPE_TASKLENS } from "./views/TaskLensView";
 
 export default class TaskLensPlugin extends Plugin {
   settings: TaskLensSettings = DEFAULT_SETTINGS;
@@ -21,7 +21,7 @@ export default class TaskLensPlugin extends Plugin {
       this.app,
       this.store,
       this.settings.excludeFolders,
-      this.settings.defaultTaskTarget
+      this.settings.defaultTaskTarget,
     );
 
     // Register the view
@@ -98,9 +98,6 @@ export default class TaskLensPlugin extends Plugin {
   async saveSettings(): Promise<void> {
     await this.saveData(this.settings);
     this.store.setCustomFilters(this.settings.filters);
-    this.fileWatcher.updateConfig(
-      this.settings.excludeFolders,
-      this.settings.defaultTaskTarget
-    );
+    this.fileWatcher.updateConfig(this.settings.excludeFolders, this.settings.defaultTaskTarget);
   }
 }

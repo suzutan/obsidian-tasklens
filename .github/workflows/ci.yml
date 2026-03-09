@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+      - run: npm ci
+
+      - name: Biome check (format + lint)
+        run: npx biome check src/
+
+      - name: Oxlint
+        run: npx oxlint src/
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit --skipLibCheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build

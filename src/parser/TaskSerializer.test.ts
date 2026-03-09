@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { serializeTask, serializeTaskFile } from "./TaskSerializer";
+import { describe, expect, it } from "vitest";
+import { getDefaultTask, type Task } from "../models/Task";
 import { parseTaskLine } from "./TaskParser";
-import { Task, getDefaultTask } from "../models/Task";
+import { serializeTask, serializeTaskFile } from "./TaskSerializer";
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return { ...getDefaultTask("test.md", "Tasks", 0), ...overrides };
@@ -156,13 +156,7 @@ describe("serializeTaskFile", () => {
 
   it("includes description when provided", () => {
     const sections = new Map<string, Task[]>();
-    const result = serializeTaskFile(
-      {},
-      "タイトル",
-      "これは説明文です",
-      [],
-      sections,
-    );
+    const result = serializeTaskFile({}, "タイトル", "これは説明文です", [], sections);
     expect(result).toContain("これは説明文です");
   });
 });
@@ -170,14 +164,16 @@ describe("serializeTaskFile", () => {
 describe("roundtrip: parse → serialize", () => {
   it("roundtrips a simple task", () => {
     const line = "- [ ] 買い物に行く #家事 📅 2026-03-31";
-    const task = parseTaskLine(line, "test.md", "Tasks", 0)!;
+    const task = parseTaskLine(line, "test.md", "Tasks", 0);
+    if (!task) throw new Error("Expected task to be parsed");
     const serialized = serializeTask(task);
     expect(serialized).toBe("- [ ] 買い物に行く #家事 📅 2026-03-31");
   });
 
   it("roundtrips a full task", () => {
     const line = "- [ ] タスク名 #label ⏫ 🔁 every week 📅 2026-03-31 ⏳ 2026-03-01 🛫 2026-02-01";
-    const task = parseTaskLine(line, "test.md", "Tasks", 0)!;
+    const task = parseTaskLine(line, "test.md", "Tasks", 0);
+    if (!task) throw new Error("Expected task to be parsed");
     const serialized = serializeTask(task);
     expect(serialized).toContain("タスク名");
     expect(serialized).toContain("#label");
@@ -190,7 +186,8 @@ describe("roundtrip: parse → serialize", () => {
 
   it("roundtrips a completed task with done date", () => {
     const line = "- [x] 完了タスク ✅ 2026-03-08";
-    const task = parseTaskLine(line, "test.md", "Tasks", 0)!;
+    const task = parseTaskLine(line, "test.md", "Tasks", 0);
+    if (!task) throw new Error("Expected task to be parsed");
     const serialized = serializeTask(task);
     expect(serialized).toBe("- [x] 完了タスク ✅ 2026-03-08");
   });

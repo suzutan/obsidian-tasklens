@@ -1,19 +1,15 @@
-import { h } from "preact";
-import { useState, useEffect, useCallback } from "preact/hooks";
-import { App, TFile } from "obsidian";
-import { TaskStore } from "../../store/TaskStore";
-import { FileWatcher } from "../../store/FileWatcher";
-import { Task, Priority, RecurrenceRule } from "../../models/Task";
-import { TaskCheckbox } from "./TaskCheckbox";
-import { RenderContent } from "./TaskItem";
+import { type App, TFile } from "obsidian";
+import { useCallback, useEffect, useState } from "preact/hooks";
+import { RECURRENCE_PRESETS, recurrenceToDisplayText } from "../../models/RecurrenceRule";
+import type { Priority, RecurrenceRule, Task } from "../../models/Task";
+import { parseNaturalLanguage } from "../../parser/NaturalLanguageParser";
+import type { FileWatcher } from "../../store/FileWatcher";
+import type { TaskStore } from "../../store/TaskStore";
+import { getTimerType, hasResourceTimer } from "../../utils/TimerUtils";
 import { DatePicker } from "../common/DatePicker";
 import { TimerDisplay } from "../common/TimerDisplay";
-import {
-  recurrenceToDisplayText,
-  RECURRENCE_PRESETS,
-} from "../../models/RecurrenceRule";
-import { getTimerType, hasResourceTimer } from "../../utils/TimerUtils";
-import { parseNaturalLanguage } from "../../parser/NaturalLanguageParser";
+import { TaskCheckbox } from "./TaskCheckbox";
+import { RenderContent } from "./TaskItem";
 
 interface TaskDetailPanelProps {
   store: TaskStore;
@@ -68,7 +64,7 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
     async (updates: Partial<Task>) => {
       await fileWatcher.writeTask({ ...task, ...updates });
     },
-    [task, fileWatcher]
+    [task, fileWatcher],
   );
 
   const handleSaveContent = async () => {
@@ -122,7 +118,7 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
     }
   };
 
-  const handleRecurrencePreset = async (preset: typeof RECURRENCE_PRESETS[number]) => {
+  const handleRecurrencePreset = async (preset: (typeof RECURRENCE_PRESETS)[number]) => {
     await saveField({ recurrence: preset.rule });
     setEditingRecurrence(false);
     if (preset.rule) {
@@ -150,7 +146,10 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
   const handleAddLabel = async () => {
     const label = labelInput.trim().replace(/^#/, "");
     if (!label) return;
-    if (task.labels.includes(label)) { setLabelInput(""); return; }
+    if (task.labels.includes(label)) {
+      setLabelInput("");
+      return;
+    }
     await saveField({ labels: [...task.labels, label] });
     setLabelInput("");
   };
@@ -181,8 +180,12 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           📄 {fileName}
         </span>
         <div class="tasklens-detail-header-actions">
-          <button class="tasklens-btn-icon" onClick={handleDeleteTask} title="削除">🗑</button>
-          <button class="tasklens-btn-icon" onClick={() => store.selectTask(null)} title="閉じる">✕</button>
+          <button type="button" class="tasklens-btn-icon" onClick={handleDeleteTask} title="削除">
+            🗑
+          </button>
+          <button type="button" class="tasklens-btn-icon" onClick={() => store.selectTask(null)} title="閉じる">
+            ✕
+          </button>
         </div>
       </div>
 
@@ -198,8 +201,9 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
                 value={contentValue}
                 onInput={(e) => setContentValue((e.target as HTMLInputElement).value)}
                 onBlur={handleSaveContent}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSaveContent(); }}
-                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveContent();
+                }}
               />
             ) : (
               <span
@@ -219,7 +223,9 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           {task.children.length > 0 && (
             <div class="tasklens-detail-description">
               {task.children.map((child, i) => (
-                <div key={i} class="tasklens-detail-child">{child}</div>
+                <div key={i} class="tasklens-detail-child">
+                  {child}
+                </div>
               ))}
             </div>
           )}
@@ -236,11 +242,7 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           )}
 
           {/* Done date */}
-          {task.doneDate && (
-            <div class="tasklens-detail-done">
-              完了: {task.doneDate}
-            </div>
-          )}
+          {task.doneDate && <div class="tasklens-detail-done">完了: {task.doneDate}</div>}
         </div>
 
         {/* Right: metadata fields (TaskLens style) */}
@@ -267,14 +269,24 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">開始日</span>
-              <button class="tasklens-detail-field-add" onClick={() => setStartDateOpen(true)} title="設定">+</button>
+              <button
+                type="button"
+                class="tasklens-detail-field-add"
+                onClick={() => setStartDateOpen(true)}
+                title="設定"
+              >
+                +
+              </button>
             </div>
             <DatePicker
               icon="🛫"
               label=""
               value={task.startDate}
               time={task.startTime}
-              onChange={(d, t) => { saveField({ startDate: d, startTime: t }); setStartDateOpen(false); }}
+              onChange={(d, t) => {
+                saveField({ startDate: d, startTime: t });
+                setStartDateOpen(false);
+              }}
               externalOpen={startDateOpen}
               onOpenChange={setStartDateOpen}
             />
@@ -284,14 +296,24 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">予定日</span>
-              <button class="tasklens-detail-field-add" onClick={() => setScheduledDateOpen(true)} title="設定">+</button>
+              <button
+                type="button"
+                class="tasklens-detail-field-add"
+                onClick={() => setScheduledDateOpen(true)}
+                title="設定"
+              >
+                +
+              </button>
             </div>
             <DatePicker
               icon="⏳"
               label=""
               value={task.scheduledDate}
               time={task.scheduledTime}
-              onChange={(d, t) => { saveField({ scheduledDate: d, scheduledTime: t }); setScheduledDateOpen(false); }}
+              onChange={(d, t) => {
+                saveField({ scheduledDate: d, scheduledTime: t });
+                setScheduledDateOpen(false);
+              }}
               externalOpen={scheduledDateOpen}
               onOpenChange={setScheduledDateOpen}
             />
@@ -301,14 +323,19 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">期限</span>
-              <button class="tasklens-detail-field-add" onClick={() => setDueDateOpen(true)} title="設定">+</button>
+              <button type="button" class="tasklens-detail-field-add" onClick={() => setDueDateOpen(true)} title="設定">
+                +
+              </button>
             </div>
             <DatePicker
               icon="📅"
               label=""
               value={task.dueDate}
               time={task.dueTime}
-              onChange={(d, t) => { saveField({ dueDate: d, dueTime: t }); setDueDateOpen(false); }}
+              onChange={(d, t) => {
+                saveField({ dueDate: d, dueTime: t });
+                setDueDateOpen(false);
+              }}
               externalOpen={dueDateOpen}
               onOpenChange={setDueDateOpen}
             />
@@ -322,12 +349,16 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
                 const colors: Record<number, string> = { 1: "#d1453b", 2: "#eb8909", 3: "#246fe0", 4: "#808080" };
                 return (
                   <button
+                    type="button"
                     key={p}
                     class={`tasklens-priority-btn ${priorityValue === p ? "tasklens-priority-btn--active" : ""}`}
                     onClick={() => handlePriorityChange(p)}
                     data-priority={p}
                   >
-                    <span class="tasklens-priority-flag" style={{ color: colors[p] }}>⚑</span> P{p}
+                    <span class="tasklens-priority-flag" style={{ color: colors[p] }}>
+                      ⚑
+                    </span>{" "}
+                    P{p}
                   </button>
                 );
               })}
@@ -338,25 +369,44 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">ラベル</span>
-              <button class="tasklens-detail-field-add" onClick={() => setEditingLabels(true)} title="追加">+</button>
+              <button
+                type="button"
+                class="tasklens-detail-field-add"
+                onClick={() => setEditingLabels(true)}
+                title="追加"
+              >
+                +
+              </button>
             </div>
             {(task.labels.length > 0 || editingLabels) && (
               <div class="tasklens-detail-labels">
                 {task.labels.map((label) => (
                   <span key={label} class="tasklens-label-badge tasklens-label-badge--removable">
                     #{label}
-                    <button class="tasklens-label-remove" onClick={() => handleRemoveLabel(label)}>✕</button>
+                    <button type="button" class="tasklens-label-remove" onClick={() => handleRemoveLabel(label)}>
+                      ✕
+                    </button>
                   </span>
                 ))}
                 {editingLabels && (
                   <div class="tasklens-label-add-form">
-                    <input type="text" class="tasklens-input tasklens-input--small" value={labelInput} placeholder="ラベル名"
+                    <input
+                      type="text"
+                      class="tasklens-input tasklens-input--small"
+                      value={labelInput}
+                      placeholder="ラベル名"
                       onInput={(e) => setLabelInput((e.target as HTMLInputElement).value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddLabel();
-                        if (e.key === "Escape") { setEditingLabels(false); setLabelInput(""); }
-                      }} autoFocus />
-                    <button class="tasklens-btn tasklens-btn--small" onClick={handleAddLabel}>追加</button>
+                        if (e.key === "Escape") {
+                          setEditingLabels(false);
+                          setLabelInput("");
+                        }
+                      }}
+                    />
+                    <button type="button" class="tasklens-btn tasklens-btn--small" onClick={handleAddLabel}>
+                      追加
+                    </button>
                   </div>
                 )}
               </div>
@@ -368,9 +418,18 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">繰り返し</span>
               {task.recurrence ? (
-                <button class="tasklens-detail-field-add" onClick={handleRecurrenceClear} title="解除">✕</button>
+                <button type="button" class="tasklens-detail-field-add" onClick={handleRecurrenceClear} title="解除">
+                  ✕
+                </button>
               ) : (
-                <button class="tasklens-detail-field-add" onClick={() => setEditingRecurrence(true)} title="設定">+</button>
+                <button
+                  type="button"
+                  class="tasklens-detail-field-add"
+                  onClick={() => setEditingRecurrence(true)}
+                  title="設定"
+                >
+                  +
+                </button>
               )}
             </div>
             {!editingRecurrence && task.recurrence && (
@@ -386,42 +445,91 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
               <div class="tasklens-detail-recurrence-editor">
                 <div class="tasklens-recurrence-presets">
                   {RECURRENCE_PRESETS.map((preset) => (
-                    <button key={preset.label} class="tasklens-btn tasklens-btn--small" onClick={() => handleRecurrencePreset(preset)}>
+                    <button
+                      type="button"
+                      key={preset.label}
+                      class="tasklens-btn tasklens-btn--small"
+                      onClick={() => handleRecurrencePreset(preset)}
+                    >
                       {preset.label}
                     </button>
                   ))}
                 </div>
                 <div class="tasklens-recurrence-custom">
                   <div class="tasklens-recurrence-row">
-                    <select class="tasklens-select" value={recurrenceType} onChange={(e) => setRecurrenceType((e.target as HTMLSelectElement).value)}>
+                    <select
+                      class="tasklens-select"
+                      value={recurrenceType}
+                      onChange={(e) =>
+                        setRecurrenceType(
+                          (e.target as HTMLSelectElement).value as "daily" | "weekly" | "monthly" | "yearly",
+                        )
+                      }
+                    >
                       <option value="daily">日</option>
                       <option value="weekly">週</option>
                       <option value="monthly">月</option>
                       <option value="yearly">年</option>
                     </select>
                     <label class="tasklens-recurrence-interval-label">ごと</label>
-                    <input type="number" class="tasklens-input tasklens-input--small" value={recurrenceInterval} min={1} max={99}
-                      onInput={(e) => setRecurrenceInterval(parseInt((e.target as HTMLInputElement).value) || 1)} />
+                    <input
+                      type="number"
+                      class="tasklens-input tasklens-input--small"
+                      value={recurrenceInterval}
+                      min={1}
+                      max={99}
+                      onInput={(e) => setRecurrenceInterval(parseInt((e.target as HTMLInputElement).value, 10) || 1)}
+                    />
                     <span class="tasklens-recurrence-interval-label">間隔</span>
                   </div>
                   {(recurrenceType === "weekly" || recurrenceType === "monthly") && (
                     <div class="tasklens-recurrence-row">
-                      <label class="tasklens-recurrence-interval-label">{recurrenceType === "weekly" ? "曜日:" : "日:"}</label>
+                      <label class="tasklens-recurrence-interval-label">
+                        {recurrenceType === "weekly" ? "曜日:" : "日:"}
+                      </label>
                       {recurrenceType === "weekly" ? (
-                        <select class="tasklens-select" value={recurrenceOn} onChange={(e) => setRecurrenceOn((e.target as HTMLSelectElement).value)}>
+                        <select
+                          class="tasklens-select"
+                          value={recurrenceOn}
+                          onChange={(e) => setRecurrenceOn((e.target as HTMLSelectElement).value)}
+                        >
                           <option value="">指定なし</option>
-                          <option value="mon">月曜</option><option value="tue">火曜</option><option value="wed">水曜</option>
-                          <option value="thu">木曜</option><option value="fri">金曜</option><option value="sat">土曜</option><option value="sun">日曜</option>
+                          <option value="mon">月曜</option>
+                          <option value="tue">火曜</option>
+                          <option value="wed">水曜</option>
+                          <option value="thu">木曜</option>
+                          <option value="fri">金曜</option>
+                          <option value="sat">土曜</option>
+                          <option value="sun">日曜</option>
                         </select>
                       ) : (
-                        <input type="number" class="tasklens-input tasklens-input--small" value={recurrenceOn} min={1} max={31} placeholder="1-31"
-                          onInput={(e) => setRecurrenceOn((e.target as HTMLInputElement).value)} />
+                        <input
+                          type="number"
+                          class="tasklens-input tasklens-input--small"
+                          value={recurrenceOn}
+                          min={1}
+                          max={31}
+                          placeholder="1-31"
+                          onInput={(e) => setRecurrenceOn((e.target as HTMLInputElement).value)}
+                        />
                       )}
                     </div>
                   )}
                   <div class="tasklens-recurrence-row">
-                    <button class="tasklens-btn tasklens-btn-primary tasklens-btn--small" onClick={handleRecurrenceSave}>設定</button>
-                    <button class="tasklens-btn tasklens-btn--small" onClick={() => setEditingRecurrence(false)}>キャンセル</button>
+                    <button
+                      type="button"
+                      class="tasklens-btn tasklens-btn-primary tasklens-btn--small"
+                      onClick={handleRecurrenceSave}
+                    >
+                      設定
+                    </button>
+                    <button
+                      type="button"
+                      class="tasklens-btn tasklens-btn--small"
+                      onClick={() => setEditingRecurrence(false)}
+                    >
+                      キャンセル
+                    </button>
                   </div>
                 </div>
               </div>
@@ -432,7 +540,14 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
               <span class="tasklens-detail-field-label">位置情報</span>
-              <button class="tasklens-detail-field-add" onClick={() => setEditingLocation(true)} title="追加">+</button>
+              <button
+                type="button"
+                class="tasklens-detail-field-add"
+                onClick={() => setEditingLocation(true)}
+                title="追加"
+              >
+                +
+              </button>
             </div>
             {editingLocation ? (
               <div class="tasklens-location-edit">
@@ -442,16 +557,49 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
                   placeholder="URL、住所、座標など"
                   onInput={(e) => setLocationValue((e.target as HTMLInputElement).value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") { saveField({ location: locationValue.trim() || null }); setEditingLocation(false); }
-                    if (e.key === "Escape") { setLocationValue(task.location || ""); setEditingLocation(false); }
+                    if (e.key === "Enter") {
+                      saveField({ location: locationValue.trim() || null });
+                      setEditingLocation(false);
+                    }
+                    if (e.key === "Escape") {
+                      setLocationValue(task.location || "");
+                      setEditingLocation(false);
+                    }
                   }}
-                  autoFocus
                 />
                 <div class="tasklens-location-edit-actions">
-                  <button class="tasklens-btn tasklens-btn-primary tasklens-btn-sm" onClick={() => { saveField({ location: locationValue.trim() || null }); setEditingLocation(false); }}>保存</button>
-                  <button class="tasklens-btn tasklens-btn-sm" onClick={() => { setLocationValue(task.location || ""); setEditingLocation(false); }}>キャンセル</button>
+                  <button
+                    type="button"
+                    class="tasklens-btn tasklens-btn-primary tasklens-btn-sm"
+                    onClick={() => {
+                      saveField({ location: locationValue.trim() || null });
+                      setEditingLocation(false);
+                    }}
+                  >
+                    保存
+                  </button>
+                  <button
+                    type="button"
+                    class="tasklens-btn tasklens-btn-sm"
+                    onClick={() => {
+                      setLocationValue(task.location || "");
+                      setEditingLocation(false);
+                    }}
+                  >
+                    キャンセル
+                  </button>
                   {task.location && (
-                    <button class="tasklens-btn tasklens-btn-sm" onClick={() => { saveField({ location: null }); setLocationValue(""); setEditingLocation(false); }}>削除</button>
+                    <button
+                      type="button"
+                      class="tasklens-btn tasklens-btn-sm"
+                      onClick={() => {
+                        saveField({ location: null });
+                        setLocationValue("");
+                        setEditingLocation(false);
+                      }}
+                    >
+                      削除
+                    </button>
                   )}
                 </div>
               </div>
@@ -489,12 +637,20 @@ function LocationValue({ value }: { value: string }) {
   if (isGeo) {
     const coords = value.replace("geo:", "");
     const url = `https://www.google.com/maps/search/?api=1&query=${coords}`;
-    return <a class="tasklens-location-link" href={url} onClick={openUrl(url)}>📍 {coords}</a>;
+    return (
+      <a class="tasklens-location-link" href={url} onClick={openUrl(url)}>
+        📍 {coords}
+      </a>
+    );
   }
 
   if (isCoords) {
     const url = `https://www.google.com/maps/search/?api=1&query=${value}`;
-    return <a class="tasklens-location-link" href={url} onClick={openUrl(url)}>📍 {value}</a>;
+    return (
+      <a class="tasklens-location-link" href={url} onClick={openUrl(url)}>
+        📍 {value}
+      </a>
+    );
   }
 
   return <span class="tasklens-location-text">📍 {value}</span>;

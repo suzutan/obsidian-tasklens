@@ -45,7 +45,10 @@ export type PriorityLevel = "highest" | "high" | "medium" | "low" | "none";
 
 export type SortField = "due" | "priority" | "path" | "done" | "scheduled" | "start" | "description";
 export type SortDirection = "asc" | "desc";
-export interface SortRule { field: SortField; direction: SortDirection }
+export interface SortRule {
+  field: SortField;
+  direction: SortDirection;
+}
 
 export type GroupField = "filename" | "path" | "due" | "priority" | "heading" | "tags" | "folder";
 
@@ -60,7 +63,10 @@ export interface ParsedQuery {
  * Parse a multi-line query string into a structured query.
  */
 export function parseQuery(queryStr: string): ParsedQuery {
-  const lines = queryStr.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const lines = queryStr
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
   const filterLines: string[] = [];
   const sort: SortRule[] = [];
   const group: GroupField[] = [];
@@ -89,7 +95,7 @@ export function parseQuery(queryStr: string): ParsedQuery {
     // limit N
     const limitMatch = line.match(/^limit\s+(\d+)$/i);
     if (limitMatch) {
-      limit = parseInt(limitMatch[1]);
+      limit = parseInt(limitMatch[1], 10);
       continue;
     }
 
@@ -100,7 +106,7 @@ export function parseQuery(queryStr: string): ParsedQuery {
   let filter: FilterNode | null = null;
   if (filterLines.length > 0) {
     // Multiple filter lines are implicitly ANDed
-    const nodes = filterLines.map(l => parseFilterLine(l));
+    const nodes = filterLines.map((l) => parseFilterLine(l));
     filter = nodes.reduce((acc, node) => {
       if (!acc) return node;
       return { type: "and", left: acc, right: node };
@@ -226,7 +232,7 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
   // Supports: today, before/after today, on/before/after YYYY-MM-DD,
   //   before/after N days/weeks/months ago, before/after in N days/weeks/months
   const dateMatch = remaining.match(
-    /^(due|scheduled|starts?|done)\s+(today|before\s+today|after\s+today|on\s+\d{4}-\d{2}-\d{2}|before\s+\d{4}-\d{2}-\d{2}|after\s+\d{4}-\d{2}-\d{2}|(?:before|after)\s+\d+\s+(?:days?|weeks?|months?)\s+ago|(?:before|after)\s+in\s+\d+\s+(?:days?|weeks?|months?))\b/i
+    /^(due|scheduled|starts?|done)\s+(today|before\s+today|after\s+today|on\s+\d{4}-\d{2}-\d{2}|before\s+\d{4}-\d{2}-\d{2}|after\s+\d{4}-\d{2}-\d{2}|(?:before|after)\s+\d+\s+(?:days?|weeks?|months?)\s+ago|(?:before|after)\s+in\s+\d+\s+(?:days?|weeks?|months?))\b/i,
   );
   if (dateMatch) {
     const field = normalizeDateField(dateMatch[1]);
@@ -246,15 +252,17 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
       value = opStr.slice(3);
     } else {
       // Check for relative dates: "before/after N days/weeks/months ago" or "before/after in N days/weeks/months"
-      const relMatch = opStr.match(/^(before|after)\s+(?:(\d+)\s+(days?|weeks?|months?)\s+ago|in\s+(\d+)\s+(days?|weeks?|months?))$/);
+      const relMatch = opStr.match(
+        /^(before|after)\s+(?:(\d+)\s+(days?|weeks?|months?)\s+ago|in\s+(\d+)\s+(days?|weeks?|months?))$/,
+      );
       if (relMatch) {
         op = relMatch[1] === "before" ? "before" : "after";
         if (relMatch[2]) {
           // N units ago
-          value = resolveRelativeDate(-parseInt(relMatch[2]), relMatch[3]);
+          value = resolveRelativeDate(-parseInt(relMatch[2], 10), relMatch[3]);
         } else {
           // in N units
-          value = resolveRelativeDate(parseInt(relMatch[4]), relMatch[5]);
+          value = resolveRelativeDate(parseInt(relMatch[4], 10), relMatch[5]);
         }
       } else if (opStr.startsWith("before ")) {
         op = "before";
@@ -288,7 +296,7 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
   const pathMatch = remaining.match(/^path\s+includes\s+(.+?)(?:\s+(?:AND|OR|NOT|\))|$)/i);
   if (pathMatch) {
     const text = pathMatch[1].trim();
-    const tokenCount = ("path includes " + text).split(/\s+/).length;
+    const tokenCount = `path includes ${text}`.split(/\s+/).length;
     return { node: { type: "path_includes", text }, pos: pos + tokenCount };
   }
 
@@ -296,7 +304,7 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
   const descMatch = remaining.match(/^description\s+includes\s+(.+?)(?:\s+(?:AND|OR|NOT|\))|$)/i);
   if (descMatch) {
     const text = descMatch[1].trim();
-    const tokenCount = ("description includes " + text).split(/\s+/).length;
+    const tokenCount = `description includes ${text}`.split(/\s+/).length;
     return { node: { type: "description_includes", text }, pos: pos + tokenCount };
   }
 
@@ -304,7 +312,7 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
   const headingMatch = remaining.match(/^heading\s+includes\s+(.+?)(?:\s+(?:AND|OR|NOT|\))|$)/i);
   if (headingMatch) {
     const text = headingMatch[1].trim();
-    const tokenCount = ("heading includes " + text).split(/\s+/).length;
+    const tokenCount = `heading includes ${text}`.split(/\s+/).length;
     return { node: { type: "heading_includes", text }, pos: pos + tokenCount };
   }
 

@@ -1,6 +1,5 @@
-import { h } from "preact";
+import type { RecurrenceRule } from "../../models/Task";
 import { getDateLabel } from "../../utils/DateUtils";
-import { RecurrenceRule } from "../../models/Task";
 
 interface DateChipProps {
   dueDate: string;

@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface EmojiPickerProps {
   value: string;
@@ -9,7 +8,28 @@ interface EmojiPickerProps {
 const EMOJI_CATEGORIES: { name: string; emojis: string[] }[] = [
   {
     name: "よく使う",
-    emojis: ["🔍", "📅", "📆", "⚡", "📋", "⏫", "🔼", "🏷", "📥", "⭐", "🎯", "🔥", "💡", "✅", "❌", "⏰", "📌", "🚀", "💪", "🎮"],
+    emojis: [
+      "🔍",
+      "📅",
+      "📆",
+      "⚡",
+      "📋",
+      "⏫",
+      "🔼",
+      "🏷",
+      "📥",
+      "⭐",
+      "🎯",
+      "🔥",
+      "💡",
+      "✅",
+      "❌",
+      "⏰",
+      "📌",
+      "🚀",
+      "💪",
+      "🎮",
+    ],
   },
   {
     name: "顔",
@@ -17,15 +37,78 @@ const EMOJI_CATEGORIES: { name: string; emojis: string[] }[] = [
   },
   {
     name: "記号",
-    emojis: ["❤️", "💜", "💙", "💚", "💛", "🧡", "🤍", "🖤", "⭕", "❗", "❓", "💯", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚪", "⚫"],
+    emojis: [
+      "❤️",
+      "💜",
+      "💙",
+      "💚",
+      "💛",
+      "🧡",
+      "🤍",
+      "🖤",
+      "⭕",
+      "❗",
+      "❓",
+      "💯",
+      "🔴",
+      "🟠",
+      "🟡",
+      "🟢",
+      "🔵",
+      "🟣",
+      "⚪",
+      "⚫",
+    ],
   },
   {
     name: "物",
-    emojis: ["📁", "📂", "📝", "📎", "🔗", "🔒", "🔑", "🛠", "⚙️", "🧪", "💻", "📱", "🏠", "🏢", "🏦", "🎓", "🎨", "🎵", "📸", "🎬"],
+    emojis: [
+      "📁",
+      "📂",
+      "📝",
+      "📎",
+      "🔗",
+      "🔒",
+      "🔑",
+      "🛠",
+      "⚙️",
+      "🧪",
+      "💻",
+      "📱",
+      "🏠",
+      "🏢",
+      "🏦",
+      "🎓",
+      "🎨",
+      "🎵",
+      "📸",
+      "🎬",
+    ],
   },
   {
     name: "自然",
-    emojis: ["🌟", "⚡", "🔥", "❄️", "🌈", "☀️", "🌙", "⭐", "💧", "🌊", "🌸", "🍀", "🌲", "🍎", "🍕", "☕", "🍺", "🧊", "🎂", "🍰"],
+    emojis: [
+      "🌟",
+      "⚡",
+      "🔥",
+      "❄️",
+      "🌈",
+      "☀️",
+      "🌙",
+      "⭐",
+      "💧",
+      "🌊",
+      "🌸",
+      "🍀",
+      "🌲",
+      "🍎",
+      "🍕",
+      "☕",
+      "🍺",
+      "🧊",
+      "🎂",
+      "🍰",
+    ],
   },
   {
     name: "動物",
@@ -50,12 +133,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
 
   return (
     <div class="tasklens-emoji-picker" ref={containerRef}>
-      <button
-        class="tasklens-emoji-picker-trigger"
-        onClick={() => setOpen(!open)}
-        type="button"
-        title="絵文字を選択"
-      >
+      <button class="tasklens-emoji-picker-trigger" onClick={() => setOpen(!open)} type="button" title="絵文字を選択">
         {value || "🔍"}
       </button>
       {open && (
@@ -68,7 +146,10 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                   <button
                     key={emoji}
                     class={`tasklens-emoji-picker-item ${emoji === value ? "tasklens-emoji-picker-item--active" : ""}`}
-                    onClick={() => { onChange(emoji); setOpen(false); }}
+                    onClick={() => {
+                      onChange(emoji);
+                      setOpen(false);
+                    }}
                     type="button"
                   >
                     {emoji}

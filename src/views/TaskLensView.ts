@@ -1,9 +1,9 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
-import { render, h } from "preact";
+import { ItemView, type WorkspaceLeaf } from "obsidian";
+import { h, render } from "preact";
 import { App as PreactApp } from "../components/App";
-import { TaskStore } from "../store/TaskStore";
-import { FileWatcher } from "../store/FileWatcher";
-import { FilterDefinition } from "../settings";
+import type { FilterDefinition } from "../settings";
+import type { FileWatcher } from "../store/FileWatcher";
+import type { TaskStore } from "../store/TaskStore";
 
 export const VIEW_TYPE_TASKLENS = "tasklens-view";
 
@@ -16,7 +16,7 @@ export class TaskLensView extends ItemView {
     leaf: WorkspaceLeaf,
     store: TaskStore,
     fileWatcher: FileWatcher,
-    onSaveFilters?: (filters: FilterDefinition[]) => void
+    onSaveFilters?: (filters: FilterDefinition[]) => void,
   ) {
     super(leaf);
     this.store = store;
@@ -48,7 +48,7 @@ export class TaskLensView extends ItemView {
         app: this.app,
         onSaveFilters: this.onSaveFilters,
       }),
-      container
+      container,
     );
   }
 

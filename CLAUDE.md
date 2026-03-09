@@ -16,7 +16,14 @@ npm run build     # production build → main.js（sourcemapなし）
 npm run dev       # watch mode（~/Documents/main/.obsidian/plugins/tasklens/ へ自動コピー）
 ```
 
-- **テスト**: `npm test`（vitest run）, `npm run test:watch`（vitest watch）— リント・CIは未導入
+- **テスト**: `npm test`（vitest run）, `npm run test:watch`（vitest watch）
+- **リント/フォーマット**:
+  - `npm run format` — Biome フォーマッター実行（`src/` を自動修正）
+  - `npm run format:check` — Biome チェック（format + lint、CI用）
+  - `npm run lint` — Oxlint 実行（TypeScript固有lint）
+  - Biome: formatter（indent 2 spaces, lineWidth 120）+ recommended linter ルール
+  - Oxlint: `typescript/no-explicit-any: error`（`any` 型の使用を禁止）
+- **プリコミットフック**: Lefthook（biome check, oxlint, tsc --noEmit, npm test を並列実行）
 - 成果物: `main.js`（バンドル）, `styles.css`（手書き）, `manifest.json`
 - `styles.css` はObsidian CSSカスタムプロパティ（`--text-normal`, `--background-primary`等）を使用
 - esbuildの外部モジュール: `obsidian`, `electron`, `@codemirror/*`, `@lezer/*`
