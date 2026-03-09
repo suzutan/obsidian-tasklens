@@ -128,6 +128,14 @@ describe("parseNaturalLanguage", () => {
     });
   });
 
+  describe("note mode", () => {
+    it("detects * prefix as note mode", () => {
+      const result = parseNaturalLanguage("* メモ内容");
+      expect(result.noteMode).toBe(true);
+      expect(result.content).toBe("メモ内容");
+    });
+  });
+
   describe("plain text", () => {
     it("returns content with no metadata", () => {
       const result = parseNaturalLanguage("単純なタスク");

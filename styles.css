@@ -1978,3 +1978,20 @@
     padding: 16px 20px;
   }
 }
+
+/* ===== Note Mode ===== */
+.tasklens-note-bullet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.tasklens-task-item--note .tasklens-task-text {
+  color: var(--text-muted);
+}

@@ -25,6 +25,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
   const itemRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = async () => {
+    if (task.noteMode) return;
     if (task.completed) {
       await fileWatcher.uncompleteTask(task.id);
     } else {
@@ -43,7 +44,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
       ref={itemRef}
       class={`tasklens-task-item ${isSelected ? "tasklens-task-item--selected" : ""} ${
         task.completed ? "tasklens-task-item--done" : ""
-      }`}
+      } ${task.noteMode ? "tasklens-task-item--note" : ""}`}
       style={{ paddingLeft: `${task.indent * 28 + 4}px` }}
       onClick={handleClick}
       draggable
@@ -88,7 +89,11 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
       }}
     >
       <div class="tasklens-task-drag-handle">⠿</div>
-      <TaskCheckbox priority={task.priority} completed={task.completed} onChange={handleToggle} />
+      {task.noteMode ? (
+        <span class="tasklens-note-bullet">•</span>
+      ) : (
+        <TaskCheckbox priority={task.priority} completed={task.completed} onChange={handleToggle} />
+      )}
       <div class="tasklens-task-content">
         <span class={`tasklens-task-text ${task.completed ? "tasklens-task-text--done" : ""}`}>
           <RenderContent text={task.content} />

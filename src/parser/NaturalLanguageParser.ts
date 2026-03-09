@@ -11,6 +11,7 @@ export interface ParsedInput {
   startTime: string | null;
   priority: Priority;
   labels: string[];
+  noteMode: boolean;
 }
 
 /**
@@ -33,6 +34,13 @@ export function parseNaturalLanguage(input: string): ParsedInput {
   let startTime: string | null = null;
   let priority: Priority = 4;
   const labels: string[] = [];
+
+  // Note mode: "* " prefix
+  let noteMode = false;
+  if (text.startsWith("* ")) {
+    noteMode = true;
+    text = text.slice(2);
+  }
 
   // Extract priority: p1, p2, p3, p4 (word boundary)
   text = text.replace(/\bp([1-4])\b/g, (_, p) => {
@@ -82,7 +90,18 @@ export function parseNaturalLanguage(input: string): ParsedInput {
   // Clean up
   text = text.replace(/\s{2,}/g, " ").trim();
 
-  return { content: text, dueDate, dueTime, scheduledDate, scheduledTime, startDate, startTime, priority, labels };
+  return {
+    content: text,
+    dueDate,
+    dueTime,
+    scheduledDate,
+    scheduledTime,
+    startDate,
+    startTime,
+    priority,
+    labels,
+    noteMode,
+  };
 }
 
 interface DateExtractResult {

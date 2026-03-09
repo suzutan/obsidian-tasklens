@@ -111,11 +111,16 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
   };
 
   const handleToggle = async () => {
+    if (task.noteMode) return;
     if (task.completed) {
       await fileWatcher.uncompleteTask(task.id);
     } else {
       await fileWatcher.completeTask(task.id);
     }
+  };
+
+  const handleToggleNoteMode = async () => {
+    await saveField({ noteMode: !task.noteMode });
   };
 
   const handleRecurrencePreset = async (preset: (typeof RECURRENCE_PRESETS)[number]) => {
@@ -194,7 +199,11 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
         {/* Left: task content */}
         <div class="tasklens-detail-left">
           <div class="tasklens-detail-task-header">
-            <TaskCheckbox priority={task.priority} completed={task.completed} onChange={handleToggle} />
+            {task.noteMode ? (
+              <span class="tasklens-note-bullet">•</span>
+            ) : (
+              <TaskCheckbox priority={task.priority} completed={task.completed} onChange={handleToggle} />
+            )}
             {editingContent ? (
               <input
                 class="tasklens-input tasklens-detail-title-input"
@@ -608,6 +617,18 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
                 <LocationValue value={task.location} />
               </div>
             ) : null}
+          </div>
+
+          {/* Note mode toggle */}
+          <div class="tasklens-detail-field">
+            <span class="tasklens-detail-field-label">ノートモード</span>
+            <button
+              type="button"
+              class={`tasklens-btn tasklens-btn--small ${task.noteMode ? "tasklens-btn-primary" : ""}`}
+              onClick={handleToggleNoteMode}
+            >
+              {task.noteMode ? "ON" : "OFF"}
+            </button>
           </div>
         </div>
       </div>

@@ -34,6 +34,7 @@ describe("getDefaultTask", () => {
     expect(task.indent).toBe(0);
     expect(task.parentId).toBeNull();
     expect(task.timerConfig).toBeNull();
+    expect(task.noteMode).toBe(false);
     expect(task.location).toBeNull();
   });
 
