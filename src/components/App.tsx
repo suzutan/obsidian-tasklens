@@ -74,6 +74,7 @@ export function App({ store, fileWatcher, app, onSaveFilters }: AppProps) {
             <TaskDetailPanel
               store={store}
               fileWatcher={fileWatcher}
+              app={app}
               taskId={selectedTaskId}
             />
           </div>

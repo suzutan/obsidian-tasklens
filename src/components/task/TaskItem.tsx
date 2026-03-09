@@ -5,6 +5,7 @@ import { TaskCheckbox } from "./TaskCheckbox";
 import { DateChip } from "../common/DateChip";
 import { LabelBadge } from "../common/LabelBadge";
 import { PriorityFlag } from "../common/PriorityFlag";
+import { TimerDisplay } from "../common/TimerDisplay";
 import { TaskStore } from "../../store/TaskStore";
 import { FileWatcher } from "../../store/FileWatcher";
 
@@ -102,7 +103,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
             <DateChip dueDate={task.dueDate} dueTime={task.dueTime} recurrence={task.recurrence} />
           )}
           {task.scheduledDate && (
-            <span class="tasklens-date-chip" style={{ color: "#692fc2" }}>
+            <span class="tasklens-date-chip" style={{ color: "#4fc3f7" }}>
               ⏳ {task.scheduledDate}{task.scheduledTime ? ` ${task.scheduledTime}` : ""}
             </span>
           )}
@@ -125,6 +126,7 @@ export function TaskItem({ task, store, fileWatcher, showProject, onDragStart, o
               📍 {formatLocationShort(task.location)}
             </span>
           )}
+          <TimerDisplay task={task} variant="chip" />
           {task.labels.map((label) => (
             <LabelBadge key={label} label={label} />
           ))}
@@ -163,7 +165,7 @@ function formatLocationShort(loc: string): string {
  * Render task content with markdown links and Obsidian wiki-links as clickable elements.
  * Supports: [text](url), [[note]], [[note|alias]]
  */
-function RenderContent({ text }: { text: string }) {
+export function RenderContent({ text }: { text: string }) {
   const parts = useMemo(() => {
     const result: (string | VNode)[] = [];
     // Match markdown links [text](url) and wiki-links [[target]] or [[target|alias]]
