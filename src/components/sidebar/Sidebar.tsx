@@ -22,6 +22,23 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
   const customFilters = store.customFilters.value;
   const sourcePaths = store.allSourcePaths.value;
 
+  // Collapsible section state (persisted in localStorage)
+  const loadCollapsed = (): Record<string, boolean> => {
+    try {
+      const saved = localStorage.getItem("tasklens-collapsed-sections");
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  };
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
+
+  const toggleSection = (key: string) => {
+    setCollapsed((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem("tasklens-collapsed-sections", JSON.stringify(next));
+      return next;
+    });
+  };
+
   // Add/Edit filter state
   const [editingFilterId, setEditingFilterId] = useState<string | null>(null); // null = adding new
   const [showFilterForm, setShowFilterForm] = useState(false);
@@ -150,102 +167,125 @@ export function Sidebar({ store, fileWatcher, app, onSaveFilters }: SidebarProps
 
       {/* Custom filters */}
       <div class="tasklens-sidebar-section">
-        <div class="tasklens-sidebar-section-header">
-          <span>フィルター</span>
+        <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("filters")}>
+          <div class="tasklens-section-toggle">
+            <span class={`tasklens-section-chevron ${collapsed["filters"] ? "is-collapsed" : ""}`}>›</span>
+            <span>フィルター</span>
+          </div>
           <button
             class="tasklens-btn-icon"
-            onClick={openAddForm}
+            onClick={(e: MouseEvent) => { e.stopPropagation(); openAddForm(); }}
             title="フィルターを追加"
           >
             +
           </button>
         </div>
-        {customFilters.map((filter) => (
-          <div
-            key={filter.id}
-            onContextMenu={(e: MouseEvent) => handleFilterContextMenu(e, filter)}
-          >
-            <NavItem
-              icon={filter.icon || "🔍"}
-              label={filter.name}
-              active={currentView.type === "filter" && currentView.filterId === filter.id}
-              onClick={() => store.selectView({ type: "filter", filterId: filter.id })}
-            />
-          </div>
-        ))}
-        {showFilterForm && (
-          <div class="tasklens-add-filter">
-            <div class="tasklens-filter-name-row">
-              <EmojiPicker value={filterIcon} onChange={setFilterIcon} />
-              <input
-                ref={nameInputRef}
-                type="text"
-                class="tasklens-input tasklens-filter-name-input"
-                value={filterName}
-                placeholder="フィルター名"
-                onInput={(e) => setFilterName((e.target as HTMLInputElement).value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") closeForm();
-                }}
-              />
-            </div>
-            <textarea
-              class="tasklens-input tasklens-filter-query-input"
-              value={filterQuery}
-              placeholder={`not done\ndue today\nsort by priority`}
-              onInput={(e) => setFilterQuery((e.target as HTMLTextAreaElement).value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") closeForm();
-              }}
-              rows={4}
-            />
-            <div class="tasklens-add-filter-actions">
-              <button class="tasklens-btn tasklens-btn-primary tasklens-btn--small" onClick={handleSaveFilter}>
-                {editingFilterId ? "保存" : "追加"}
-              </button>
-              <button class="tasklens-btn tasklens-btn--small" onClick={closeForm}>キャンセル</button>
-            </div>
-          </div>
+        {!collapsed["filters"] && (
+          <>
+            {customFilters.map((filter) => (
+              <div
+                key={filter.id}
+                onContextMenu={(e: MouseEvent) => handleFilterContextMenu(e, filter)}
+              >
+                <NavItem
+                  icon={filter.icon || "🔍"}
+                  label={filter.name}
+                  active={currentView.type === "filter" && currentView.filterId === filter.id}
+                  onClick={() => store.selectView({ type: "filter", filterId: filter.id })}
+                />
+              </div>
+            ))}
+            {showFilterForm && (
+              <div class="tasklens-add-filter">
+                <div class="tasklens-filter-name-row">
+                  <EmojiPicker value={filterIcon} onChange={setFilterIcon} />
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    class="tasklens-input tasklens-filter-name-input"
+                    value={filterName}
+                    placeholder="フィルター名"
+                    onInput={(e) => setFilterName((e.target as HTMLInputElement).value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") closeForm();
+                    }}
+                  />
+                </div>
+                <textarea
+                  class="tasklens-input tasklens-filter-query-input"
+                  value={filterQuery}
+                  placeholder={`not done\ndue today\nsort by priority`}
+                  onInput={(e) => setFilterQuery((e.target as HTMLTextAreaElement).value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") closeForm();
+                  }}
+                  rows={4}
+                />
+                <div class="tasklens-add-filter-actions">
+                  <button class="tasklens-btn tasklens-btn-primary tasklens-btn--small" onClick={handleSaveFilter}>
+                    {editingFilterId ? "保存" : "追加"}
+                  </button>
+                  <button class="tasklens-btn tasklens-btn--small" onClick={closeForm}>キャンセル</button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Labels */}
       <div class="tasklens-sidebar-section">
-        <div class="tasklens-sidebar-section-header">
-          <span>ラベル</span>
+        <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("labels")}>
+          <div class="tasklens-section-toggle">
+            <span class={`tasklens-section-chevron ${collapsed["labels"] ? "is-collapsed" : ""}`}>›</span>
+            <span>ラベル</span>
+          </div>
+          {labels.length > 0 && <span class="tasklens-section-count">{labels.length}</span>}
         </div>
-        {labels.length === 0 && (
-          <div class="tasklens-sidebar-empty">ラベルなし</div>
+        {!collapsed["labels"] && (
+          <>
+            {labels.length === 0 && (
+              <div class="tasklens-sidebar-empty">ラベルなし</div>
+            )}
+            {labels.map((label) => (
+              <NavItem
+                key={label}
+                icon="🏷"
+                label={`#${label}`}
+                active={currentView.type === "label" && currentView.label === label}
+                onClick={() => store.selectView({ type: "label", label })}
+              />
+            ))}
+          </>
         )}
-        {labels.map((label) => (
-          <NavItem
-            key={label}
-            icon="🏷"
-            label={`#${label}`}
-            active={currentView.type === "label" && currentView.label === label}
-            onClick={() => store.selectView({ type: "label", label })}
-          />
-        ))}
       </div>
 
       {/* Source files by folder */}
       <div class="tasklens-sidebar-section">
-        <div class="tasklens-sidebar-section-header">
-          <span>ソース</span>
-        </div>
-        {folders.size === 0 && (
-          <div class="tasklens-sidebar-empty">タスクが見つかりません</div>
-        )}
-        {[...folders.entries()].map(([folder, paths]) => (
-          <div key={folder} class="tasklens-sidebar-source-group">
-            <NavItem
-              icon="📁"
-              label={`${folder} (${paths.length})`}
-              active={currentView.type === "source" && currentView.path === folder}
-              onClick={() => store.selectView({ type: "source", path: folder })}
-            />
+        <div class="tasklens-sidebar-section-header" onClick={() => toggleSection("sources")}>
+          <div class="tasklens-section-toggle">
+            <span class={`tasklens-section-chevron ${collapsed["sources"] ? "is-collapsed" : ""}`}>›</span>
+            <span>ソース</span>
           </div>
-        ))}
+          {folders.size > 0 && <span class="tasklens-section-count">{folders.size}</span>}
+        </div>
+        {!collapsed["sources"] && (
+          <>
+            {folders.size === 0 && (
+              <div class="tasklens-sidebar-empty">タスクが見つかりません</div>
+            )}
+            {[...folders.entries()].map(([folder, paths]) => (
+              <div key={folder} class="tasklens-sidebar-source-group">
+                <NavItem
+                  icon="📁"
+                  label={`${folder} (${paths.length})`}
+                  active={currentView.type === "source" && currentView.path === folder}
+                  onClick={() => store.selectView({ type: "source", path: folder })}
+                />
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
