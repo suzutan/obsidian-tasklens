@@ -190,7 +190,7 @@ export function DatePicker({ value, time, onChange, icon, label, hint, externalO
               class="tasklens-datepicker-shortcut"
               onClick={() => handleSelect(getNextWeekday(1), timeInput || null)}
             >
-              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#692fc2" }}>📆</span>
+              <span class="tasklens-datepicker-shortcut-icon" style={{ color: "#4fc3f7" }}>📆</span>
               <span>来週月曜</span>
               <span class="tasklens-datepicker-shortcut-day">{getNextWeekday(1)}</span>
             </button>

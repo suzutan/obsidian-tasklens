@@ -1,22 +1,28 @@
 import { h } from "preact";
 import { useState, useEffect, useCallback } from "preact/hooks";
+import { App, TFile } from "obsidian";
 import { TaskStore } from "../../store/TaskStore";
 import { FileWatcher } from "../../store/FileWatcher";
 import { Task, Priority, RecurrenceRule } from "../../models/Task";
 import { TaskCheckbox } from "./TaskCheckbox";
+import { RenderContent } from "./TaskItem";
 import { DatePicker } from "../common/DatePicker";
+import { TimerDisplay } from "../common/TimerDisplay";
 import {
   recurrenceToDisplayText,
   RECURRENCE_PRESETS,
 } from "../../models/RecurrenceRule";
+import { getTimerType } from "../../utils/TimerUtils";
+import { parseNaturalLanguage } from "../../parser/NaturalLanguageParser";
 
 interface TaskDetailPanelProps {
   store: TaskStore;
   fileWatcher: FileWatcher;
+  app: App;
   taskId: string;
 }
 
-export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelProps) {
+export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailPanelProps) {
   const task = store.getTaskById(taskId);
 
   if (!task) {
@@ -66,9 +72,40 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
   );
 
   const handleSaveContent = async () => {
-    if (contentValue.trim() && contentValue !== task.content) {
-      await saveField({ content: contentValue.trim() });
+    const trimmed = contentValue.trim();
+    if (!trimmed || trimmed === task.content) {
+      setEditingContent(false);
+      return;
     }
+
+    // Parse NLP from content (labels, dates, priority, brace dates)
+    const parsed = parseNaturalLanguage(trimmed);
+    const updates: Partial<Task> = { content: parsed.content };
+
+    // Merge new labels (add, don't replace existing)
+    if (parsed.labels.length > 0) {
+      const merged = [...new Set([...task.labels, ...parsed.labels])];
+      updates.labels = merged;
+    }
+    if (parsed.dueDate) {
+      updates.dueDate = parsed.dueDate;
+      updates.dueTime = parsed.dueTime;
+    }
+    if (parsed.scheduledDate) {
+      updates.scheduledDate = parsed.scheduledDate;
+      updates.scheduledTime = parsed.scheduledTime;
+    }
+    if (parsed.startDate) {
+      updates.startDate = parsed.startDate;
+      updates.startTime = parsed.startTime;
+    }
+    if (parsed.priority !== 4) {
+      updates.priority = parsed.priority;
+      setPriorityValue(parsed.priority);
+    }
+
+    await saveField(updates);
+    setContentValue(parsed.content);
     setEditingContent(false);
   };
 
@@ -131,8 +168,17 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
     <div class="tasklens-detail-panel">
       {/* Header bar */}
       <div class="tasklens-detail-header">
-        <span class="tasklens-detail-header-project">
-          {fileName}
+        <span
+          class="tasklens-detail-header-note"
+          onClick={() => {
+            const file = app.vault.getAbstractFileByPath(task.projectPath);
+            if (file instanceof TFile) {
+              app.workspace.getLeaf(false).openFile(file);
+            }
+          }}
+          title={task.projectPath}
+        >
+          📄 {fileName}
         </span>
         <div class="tasklens-detail-header-actions">
           <button class="tasklens-btn-icon" onClick={handleDeleteTask} title="削除">🗑</button>
@@ -158,9 +204,13 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
             ) : (
               <span
                 class={`tasklens-detail-title ${task.completed ? "tasklens-task-text--done" : ""}`}
-                onClick={() => setEditingContent(true)}
+                onClick={(e: MouseEvent) => {
+                  // Don't enter edit mode if clicking a link
+                  if ((e.target as HTMLElement).closest("a, .tasklens-task-wikilink")) return;
+                  setEditingContent(true);
+                }}
               >
-                {task.content}
+                <RenderContent text={task.content} />
               </span>
             )}
           </div>
@@ -174,6 +224,13 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
             </div>
           )}
 
+          {/* Timer display */}
+          {getTimerType(task.labels) && (
+            <div class="tasklens-detail-timer">
+              <TimerDisplay task={task} variant="detail" />
+            </div>
+          )}
+
           {/* Done date */}
           {task.doneDate && (
             <div class="tasklens-detail-done">
@@ -184,29 +241,38 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
 
         {/* Right: metadata fields (TaskLens style) */}
         <div class="tasklens-detail-right">
-          {/* Project */}
+          {/* Note */}
           <div class="tasklens-detail-field">
-            <span class="tasklens-detail-field-label">プロジェクト</span>
-            <div class="tasklens-detail-field-value">
-              <span class="tasklens-detail-field-icon">📥</span>
-              <span>{fileName}</span>
+            <span class="tasklens-detail-field-label">Note</span>
+            <div
+              class="tasklens-detail-field-value tasklens-detail-field-value--clickable"
+              onClick={() => {
+                const file = app.vault.getAbstractFileByPath(task.projectPath);
+                if (file instanceof TFile) {
+                  app.workspace.getLeaf(false).openFile(file);
+                }
+              }}
+              title={task.projectPath}
+            >
+              <span class="tasklens-detail-field-icon">📄</span>
+              <span class="tasklens-detail-note-link">{fileName}</span>
             </div>
           </div>
 
-          {/* Due date */}
+          {/* Start date */}
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
-              <span class="tasklens-detail-field-label">日付</span>
-              <button class="tasklens-detail-field-add" onClick={() => setDueDateOpen(true)} title="設定">+</button>
+              <span class="tasklens-detail-field-label">開始日</span>
+              <button class="tasklens-detail-field-add" onClick={() => setStartDateOpen(true)} title="設定">+</button>
             </div>
             <DatePicker
-              icon="📅"
+              icon="🛫"
               label=""
-              value={task.dueDate}
-              time={task.dueTime}
-              onChange={(d, t) => { saveField({ dueDate: d, dueTime: t }); setDueDateOpen(false); }}
-              externalOpen={dueDateOpen}
-              onOpenChange={setDueDateOpen}
+              value={task.startDate}
+              time={task.startTime}
+              onChange={(d, t) => { saveField({ startDate: d, startTime: t }); setStartDateOpen(false); }}
+              externalOpen={startDateOpen}
+              onOpenChange={setStartDateOpen}
             />
           </div>
 
@@ -227,20 +293,20 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
             />
           </div>
 
-          {/* Start date */}
+          {/* Due date (期限) */}
           <div class="tasklens-detail-field">
             <div class="tasklens-detail-field-row">
-              <span class="tasklens-detail-field-label">開始日</span>
-              <button class="tasklens-detail-field-add" onClick={() => setStartDateOpen(true)} title="設定">+</button>
+              <span class="tasklens-detail-field-label">期限</span>
+              <button class="tasklens-detail-field-add" onClick={() => setDueDateOpen(true)} title="設定">+</button>
             </div>
             <DatePicker
-              icon="🛫"
+              icon="📅"
               label=""
-              value={task.startDate}
-              time={task.startTime}
-              onChange={(d, t) => { saveField({ startDate: d, startTime: t }); setStartDateOpen(false); }}
-              externalOpen={startDateOpen}
-              onOpenChange={setStartDateOpen}
+              value={task.dueDate}
+              time={task.dueTime}
+              onChange={(d, t) => { saveField({ dueDate: d, dueTime: t }); setDueDateOpen(false); }}
+              externalOpen={dueDateOpen}
+              onOpenChange={setDueDateOpen}
             />
           </div>
 
@@ -274,7 +340,7 @@ export function TaskDetailPanel({ store, fileWatcher, taskId }: TaskDetailPanelP
               <div class="tasklens-detail-labels">
                 {task.labels.map((label) => (
                   <span key={label} class="tasklens-label-badge tasklens-label-badge--removable">
-                    @{label}
+                    #{label}
                     <button class="tasklens-label-remove" onClick={() => handleRemoveLabel(label)}>✕</button>
                   </span>
                 ))}

@@ -8,7 +8,7 @@ interface LabelBadgeProps {
 export function LabelBadge({ label, onClick }: LabelBadgeProps) {
   return (
     <span class="tasklens-label-badge" onClick={onClick}>
-      @{label}
+      #{label}
     </span>
   );
 }

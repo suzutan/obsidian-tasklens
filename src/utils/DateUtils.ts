@@ -51,7 +51,7 @@ export function getDateLabel(dueDate: string): DateLabel {
     return { text: "明日", color: "#eb8909", isOverdue: false };
   }
   if (diff <= 6) {
-    return { text: DAY_NAMES_JA[d.getDay()], color: "#692fc2", isOverdue: false };
+    return { text: DAY_NAMES_JA[d.getDay()], color: "#4fc3f7", isOverdue: false };
   }
 
   // Format as "M月D日" or "YYYY年M月D日"
