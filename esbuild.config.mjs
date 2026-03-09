@@ -16,6 +16,7 @@ const prod = process.argv[2] === "production";
 const vaultPluginDir = join(
   process.env.HOME || process.env.USERPROFILE,
   "Documents",
+  "obsidian",
   "main",
   ".obsidian",
   "plugins",
