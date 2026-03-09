@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "case \"$TOOL_INPUT\" in *biome.json*|*oxlintrc.json*|*tsconfig.json*|*lefthook.yml*) echo 'BLOCKED: Protected config file. Edit manually if needed.' && exit 2 ;; esac"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "filepath=$(echo \"$TOOL_INPUT\" | grep -oE '\"file_path\":\\s*\"[^\"]+\"' | head -1 | sed 's/\"file_path\":\\s*\"//;s/\"$//'); case \"$filepath\" in *.ts|*.tsx) npx biome check --write \"$filepath\" 2>&1 && npx oxlint \"$filepath\" 2>&1 ;; esac; exit 0"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test 2>&1"
+          }
+        ]
+      }
+    ]
+  }
+}
