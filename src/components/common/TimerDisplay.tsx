@@ -23,17 +23,12 @@ interface TimerDisplayProps {
   onUpdateTimerConfig?: (config: Task["timerConfig"]) => void;
 }
 
-/** Format ms-from-now as an absolute time string like "3/10 15:30" or "15:30" */
+/** Format ms-from-now as an absolute time string like "3/10 15:30" */
 function formatAbsoluteTime(ms: number): string {
   const target = new Date(Date.now() + ms);
-  const now = new Date();
   const hh = String(target.getHours()).padStart(2, "0");
   const mm = String(target.getMinutes()).padStart(2, "0");
-  // Show date if different day
-  if (target.getDate() !== now.getDate() || target.getMonth() !== now.getMonth()) {
-    return `${target.getMonth() + 1}/${target.getDate()} ${hh}:${mm}`;
-  }
-  return `${hh}:${mm}`;
+  return `${target.getMonth() + 1}/${target.getDate()} ${hh}:${mm}`;
 }
 
 /**
