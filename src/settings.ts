@@ -52,6 +52,33 @@ sort by priority`,
 sort by path
 sort by priority`,
   },
+  {
+    id: "__unplanned",
+    name: "予定なし",
+    icon: "📭",
+    query: `not done
+no due date
+no scheduled date
+sort by path
+sort by priority`,
+  },
+  {
+    id: "__stale",
+    name: "放置タスク",
+    icon: "🕸",
+    query: `not done
+due before 7 days ago
+sort by due date
+sort by priority`,
+  },
+  {
+    id: "__timers",
+    name: "タイマー",
+    icon: "⏱",
+    query: `not done
+(tag includes #countdown) OR (tag includes #elapsed) OR (tag includes #countdown-elapsed)
+sort by due date`,
+  },
 ];
 
 export const DEFAULT_SETTINGS: TaskLensSettings = {

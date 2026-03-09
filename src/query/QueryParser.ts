@@ -4,6 +4,7 @@
  * Supported syntax:
  *   done / not done
  *   due today / due before today / due after today / due on YYYY-MM-DD
+ *   due before 7 days ago / due after in 3 days / due before 2 weeks ago
  *   scheduled today / scheduled before today / ...
  *   starts today / starts before today / ...
  *   has due date / no due date / has scheduled date / no scheduled date / has start date / no start date
@@ -222,7 +223,11 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
   }
 
   // Date filters: due/scheduled/starts/done + operator
-  const dateMatch = remaining.match(/^(due|scheduled|starts?|done)\s+(today|before\s+today|after\s+today|on\s+\d{4}-\d{2}-\d{2}|before\s+\d{4}-\d{2}-\d{2}|after\s+\d{4}-\d{2}-\d{2})\b/i);
+  // Supports: today, before/after today, on/before/after YYYY-MM-DD,
+  //   before/after N days/weeks/months ago, before/after in N days/weeks/months
+  const dateMatch = remaining.match(
+    /^(due|scheduled|starts?|done)\s+(today|before\s+today|after\s+today|on\s+\d{4}-\d{2}-\d{2}|before\s+\d{4}-\d{2}-\d{2}|after\s+\d{4}-\d{2}-\d{2}|(?:before|after)\s+\d+\s+(?:days?|weeks?|months?)\s+ago|(?:before|after)\s+in\s+\d+\s+(?:days?|weeks?|months?))\b/i
+  );
   if (dateMatch) {
     const field = normalizeDateField(dateMatch[1]);
     const opStr = dateMatch[2].toLowerCase();
@@ -239,14 +244,27 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
     } else if (opStr.startsWith("on ")) {
       op = "on";
       value = opStr.slice(3);
-    } else if (opStr.startsWith("before ")) {
-      op = "before";
-      value = opStr.slice(7);
-    } else if (opStr.startsWith("after ")) {
-      op = "after";
-      value = opStr.slice(6);
     } else {
-      op = "today";
+      // Check for relative dates: "before/after N days/weeks/months ago" or "before/after in N days/weeks/months"
+      const relMatch = opStr.match(/^(before|after)\s+(?:(\d+)\s+(days?|weeks?|months?)\s+ago|in\s+(\d+)\s+(days?|weeks?|months?))$/);
+      if (relMatch) {
+        op = relMatch[1] === "before" ? "before" : "after";
+        if (relMatch[2]) {
+          // N units ago
+          value = resolveRelativeDate(-parseInt(relMatch[2]), relMatch[3]);
+        } else {
+          // in N units
+          value = resolveRelativeDate(parseInt(relMatch[4]), relMatch[5]);
+        }
+      } else if (opStr.startsWith("before ")) {
+        op = "before";
+        value = opStr.slice(7);
+      } else if (opStr.startsWith("after ")) {
+        op = "after";
+        value = opStr.slice(6);
+      } else {
+        op = "today";
+      }
     }
 
     return { node: { type: "date_filter", field, op, value }, pos: pos + tokenCount };
@@ -300,6 +318,27 @@ function parseAtom(tokens: string[], pos: number): ParseResult {
 
   // Fallback: skip this token
   return { node: { type: "not_done" }, pos: pos + 1 };
+}
+
+/**
+ * Resolve a relative date offset to a YYYY-MM-DD string.
+ * @param offset - positive for future, negative for past
+ * @param unit - "day(s)", "week(s)", "month(s)"
+ */
+function resolveRelativeDate(offset: number, unit: string): string {
+  const d = new Date();
+  const u = unit.toLowerCase().replace(/s$/, "");
+  if (u === "day") {
+    d.setDate(d.getDate() + offset);
+  } else if (u === "week") {
+    d.setDate(d.getDate() + offset * 7);
+  } else if (u === "month") {
+    d.setMonth(d.getMonth() + offset);
+  }
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function normalizeDateField(text: string): DateField {
