@@ -12,7 +12,7 @@ import {
   recurrenceToDisplayText,
   RECURRENCE_PRESETS,
 } from "../../models/RecurrenceRule";
-import { getTimerType } from "../../utils/TimerUtils";
+import { getTimerType, hasResourceTimer } from "../../utils/TimerUtils";
 import { parseNaturalLanguage } from "../../parser/NaturalLanguageParser";
 
 interface TaskDetailPanelProps {
@@ -225,9 +225,13 @@ export function TaskDetailPanel({ store, fileWatcher, app, taskId }: TaskDetailP
           )}
 
           {/* Timer display */}
-          {getTimerType(task.labels) && (
+          {(getTimerType(task.labels) || hasResourceTimer(task.labels)) && (
             <div class="tasklens-detail-timer">
-              <TimerDisplay task={task} variant="detail" />
+              <TimerDisplay
+                task={task}
+                variant="detail"
+                onUpdateTimerConfig={(config) => saveField({ timerConfig: config })}
+              />
             </div>
           )}
 

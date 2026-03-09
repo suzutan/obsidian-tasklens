@@ -7,6 +7,27 @@ export interface RecurrenceRule {
   on?: string;
 }
 
+/** Stamina timer: recovers +1 every N seconds up to max */
+export interface StaminaConfig {
+  type: "stamina";
+  currentValue: number;
+  maxValue: number;
+  recoveryIntervalSeconds: number;
+  lastUpdatedAt: string; // ISO 8601
+}
+
+/** Periodic increment: +N at scheduled HH:MM times daily up to max */
+export interface PeriodicIncrementConfig {
+  type: "periodic";
+  currentValue: number;
+  maxValue: number;
+  incrementAmount: number;
+  scheduleTimes: string[]; // ["06:00", "12:00", "18:00"]
+  lastUpdatedAt: string; // ISO 8601
+}
+
+export type TimerConfig = StaminaConfig | PeriodicIncrementConfig;
+
 export interface Task {
   id: string;
   content: string;
@@ -42,6 +63,8 @@ export interface Task {
   location: string | null;
   /** Parent task ID if this is a subtask */
   parentId: string | null;
+  /** Timer configuration for stamina / periodic-increment */
+  timerConfig: TimerConfig | null;
 }
 
 export function createTaskId(projectPath: string, section: string, order: number): string {
@@ -70,5 +93,6 @@ export function getDefaultTask(projectPath: string, section: string, order: numb
     order,
     indent: 0,
     parentId: null,
+    timerConfig: null,
   };
 }

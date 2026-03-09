@@ -76,7 +76,7 @@ sort by priority`,
     name: "タイマー",
     icon: "⏱",
     query: `not done
-(tag includes #countdown) OR (tag includes #elapsed) OR (tag includes #countdown-elapsed)
+(tag includes #countdown) OR (tag includes #elapsed) OR (tag includes #countdown-elapsed) OR (tag includes #stamina) OR (tag includes #periodic)
 sort by due date`,
   },
 ];

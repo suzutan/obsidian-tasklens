@@ -1,4 +1,4 @@
-import { Task, Priority, getDefaultTask, createTaskId } from "../models/Task";
+import { Task, Priority, getDefaultTask, createTaskId, TimerConfig } from "../models/Task";
 import { parseRecurrence } from "../models/RecurrenceRule";
 
 /**
@@ -62,10 +62,10 @@ export function parseTaskLine(
   }
 
   // Recurrence: 🔁 every ...  (greedy up to next emoji or end)
-  const recurMatch = rawContent.match(/🔁\s*(.+?)(?=\s*(?:📅|⏳|🛫|✅|⏫|🔼|🔽|#\S|$))/);
+  const recurMatch = rawContent.match(/🔁\s*(.+?)(?=\s*(?:📅|⏳|🛫|✅|⏫|🔼|🔽|⚡|📈|#\S|$))/);
   if (recurMatch) {
     task.recurrence = parseRecurrence(recurMatch[1].trim());
-    rawContent = rawContent.replace(/\s*🔁\s*.+?(?=\s*(?:📅|⏳|🛫|✅|⏫|🔼|🔽|#\S|$))/g, " ");
+    rawContent = rawContent.replace(/\s*🔁\s*.+?(?=\s*(?:📅|⏳|🛫|✅|⏫|🔼|🔽|⚡|📈|#\S|$))/g, " ");
   }
 
   // Done date: ✅ YYYY-MM-DD
@@ -75,6 +75,34 @@ export function parseTaskLine(
     rawContent = rawContent.replace(/\s*✅\s*\d{4}-\d{2}-\d{2}\s*/g, " ");
   }
 
+  // Stamina timer: ⚡ current/max 🔄 Ns [📌 ISO] (📌 optional, defaults to now)
+  const staminaMatch = rawContent.match(/⚡\s*(\d+)\/(\d+)\s*🔄\s*(\d+)s(?:\s*📌\s*(\S+))?/);
+  if (staminaMatch) {
+    task.timerConfig = {
+      type: "stamina",
+      currentValue: parseInt(staminaMatch[1]),
+      maxValue: parseInt(staminaMatch[2]),
+      recoveryIntervalSeconds: parseInt(staminaMatch[3]),
+      lastUpdatedAt: staminaMatch[4] || new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+    };
+    rawContent = rawContent.replace(/\s*⚡\s*\d+\/\d+\s*🔄\s*\d+s(?:\s*📌\s*\S+)?\s*/g, " ");
+  }
+
+  // Periodic increment timer: 📈 current/max [+amount] 🕐 HH:MM,HH:MM [📌 ISO]
+  // +amount is optional (defaults to 1), 📌 is optional (defaults to now)
+  const periodicMatch = rawContent.match(/📈\s*(\d+)\/(\d+)(?:\s*\+(\d+))?\s*🕐\s*([\d:,]+)(?:\s*📌\s*(\S+))?/);
+  if (periodicMatch) {
+    task.timerConfig = {
+      type: "periodic",
+      currentValue: parseInt(periodicMatch[1]),
+      maxValue: parseInt(periodicMatch[2]),
+      incrementAmount: periodicMatch[3] ? parseInt(periodicMatch[3]) : 1,
+      scheduleTimes: periodicMatch[4].split(","),
+      lastUpdatedAt: periodicMatch[5] || new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+    };
+    rawContent = rawContent.replace(/\s*📈\s*\d+\/\d+(?:\s*\+\d+)?\s*🕐\s*[\d:,]+(?:\s*📌\s*\S+)?\s*/g, " ");
+  }
+
   // Labels/tags: #tag (but not inside words)
   const tagRegex = /(?:^|\s)#(\S+)/g;
   let tagMatch;
@@ -82,6 +110,14 @@ export function parseTaskLine(
     task.labels.push(tagMatch[1]);
   }
   rawContent = rawContent.replace(/(?:^|\s)#\S+/g, " ");
+
+  // Auto-add timer labels after label extraction to avoid duplicates
+  if (task.timerConfig?.type === "stamina" && !task.labels.includes("stamina")) {
+    task.labels.push("stamina");
+  }
+  if (task.timerConfig?.type === "periodic" && !task.labels.includes("periodic")) {
+    task.labels.push("periodic");
+  }
 
   // Clean up remaining content
   task.content = rawContent.replace(/\s+/g, " ").trim();

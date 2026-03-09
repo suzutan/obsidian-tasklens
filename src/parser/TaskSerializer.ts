@@ -1,4 +1,4 @@
-import { Task } from "../models/Task";
+import { Task, TimerConfig } from "../models/Task";
 import { serializeRecurrence } from "../models/RecurrenceRule";
 
 /**
@@ -52,6 +52,11 @@ export function serializeTask(task: Task): string {
     parts.push(`✅ ${task.doneDate}`);
   }
 
+  // Timer config (inline emoji format)
+  if (task.timerConfig) {
+    parts.push(serializeTimerConfig(task.timerConfig));
+  }
+
   let result = `${indent}- ${checkbox} ${parts.join(" ")}`;
 
   // Add children
@@ -60,6 +65,19 @@ export function serializeTask(task: Task): string {
   }
 
   return result;
+}
+
+/**
+ * Serialize timer config to inline emoji format:
+ *   ⚡ 120/200 🔄 432s 📌 2026-03-10T06:00:00Z
+ *   📈 30/100 +10 🕐 06:00,12:00,18:00 📌 2026-03-09T18:00:00Z
+ */
+function serializeTimerConfig(config: TimerConfig): string {
+  if (config.type === "stamina") {
+    return `⚡ ${config.currentValue}/${config.maxValue} 🔄 ${config.recoveryIntervalSeconds}s 📌 ${config.lastUpdatedAt}`;
+  }
+  const amountPart = config.incrementAmount > 1 ? ` +${config.incrementAmount}` : "";
+  return `📈 ${config.currentValue}/${config.maxValue}${amountPart} 🕐 ${config.scheduleTimes.join(",")} 📌 ${config.lastUpdatedAt}`;
 }
 
 /**
