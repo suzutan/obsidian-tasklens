@@ -107,6 +107,11 @@ describe("serializeTask", () => {
     expect(result).toContain("📈 30/100 +10 🕐 06:00,12:00,18:00 📌 2026-03-09T18:00:00Z");
   });
 
+  it("serializes note mode task with * prefix", () => {
+    const task = makeTask({ content: "メモ内容", noteMode: true });
+    expect(serializeTask(task)).toBe("- [ ] * メモ内容");
+  });
+
   it("serializes full task with correct field order", () => {
     const task = makeTask({
       content: "タスク名",
@@ -182,6 +187,15 @@ describe("roundtrip: parse → serialize", () => {
     expect(serialized).toContain("📅 2026-03-31");
     expect(serialized).toContain("⏳ 2026-03-01");
     expect(serialized).toContain("🛫 2026-02-01");
+  });
+
+  it("roundtrips a note mode task", () => {
+    const line = "- [ ] * メモ内容 #label 📅 2026-03-31";
+    const task = parseTaskLine(line, "test.md", "Tasks", 0);
+    if (!task) throw new Error("Expected task to be parsed");
+    expect(task.noteMode).toBe(true);
+    const serialized = serializeTask(task);
+    expect(serialized).toBe("- [ ] * メモ内容 #label 📅 2026-03-31");
   });
 
   it("roundtrips a completed task with done date", () => {

@@ -126,6 +126,27 @@ describe("parseTaskLine", () => {
     expect(task).not.toBeNull();
     expect(task?.indent).toBe(1);
   });
+
+  it("parses note mode task with * prefix", () => {
+    const task = parseTaskLine("- [ ] * メモ内容", "inbox.md", "Tasks", 0);
+    expect(task).not.toBeNull();
+    expect(task?.noteMode).toBe(true);
+    expect(task?.content).toBe("メモ内容");
+  });
+
+  it("parses note mode task with metadata", () => {
+    const task = parseTaskLine("- [ ] * メモ #label 📅 2026-03-31", "inbox.md", "Tasks", 0);
+    expect(task).not.toBeNull();
+    expect(task?.noteMode).toBe(true);
+    expect(task?.content).toBe("メモ");
+    expect(task?.labels).toContain("label");
+    expect(task?.dueDate).toBe("2026-03-31");
+  });
+
+  it("does not set note mode for normal tasks", () => {
+    const task = parseTaskLine("- [ ] 普通のタスク", "inbox.md", "Tasks", 0);
+    expect(task?.noteMode).toBe(false);
+  });
 });
 
 describe("parseTaskFile", () => {

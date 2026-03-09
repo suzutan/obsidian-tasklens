@@ -198,7 +198,8 @@ export class FileWatcher {
    * Build the markdown line for a new task using Obsidian Tasks emoji format
    */
   private buildTaskLine(parsed: ParsedInput): string {
-    const parts: string[] = [parsed.content];
+    const content = parsed.noteMode ? `* ${parsed.content}` : parsed.content;
+    const parts: string[] = [content];
 
     for (const label of parsed.labels) parts.push(`#${label}`);
 
@@ -540,7 +541,7 @@ export class FileWatcher {
    */
   async completeTask(taskId: string): Promise<void> {
     const task = this.store.getTaskById(taskId);
-    if (!task) return;
+    if (!task || task.noteMode) return;
 
     const todayStr = today();
 
@@ -566,7 +567,7 @@ export class FileWatcher {
    */
   async uncompleteTask(taskId: string): Promise<void> {
     const task = this.store.getTaskById(taskId);
-    if (!task) return;
+    if (!task || task.noteMode) return;
 
     const updated: Task = {
       ...task,

@@ -8,7 +8,8 @@ import type { Task, TimerConfig } from "../models/Task";
 export function serializeTask(task: Task): string {
   const checkbox = task.completed ? "[x]" : "[ ]";
   const indent = "  ".repeat(task.indent);
-  const parts: string[] = [task.content];
+  const content = task.noteMode ? `* ${task.content}` : task.content;
+  const parts: string[] = [content];
 
   // Labels/tags
   for (const label of task.labels) {

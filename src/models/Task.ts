@@ -65,6 +65,8 @@ export interface Task {
   parentId: string | null;
   /** Timer configuration for stamina / periodic-increment */
   timerConfig: TimerConfig | null;
+  /** Note mode — displays as bullet instead of checkbox, not completable */
+  noteMode: boolean;
 }
 
 export function createTaskId(projectPath: string, section: string, order: number): string {
@@ -94,5 +96,6 @@ export function getDefaultTask(projectPath: string, section: string, order: numb
     indent: 0,
     parentId: null,
     timerConfig: null,
+    noteMode: false,
   };
 }

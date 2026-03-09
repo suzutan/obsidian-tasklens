@@ -123,6 +123,12 @@ export function parseTaskLine(
   // Clean up remaining content
   task.content = rawContent.replace(/\s+/g, " ").trim();
 
+  // Note mode: content starting with "* " prefix
+  if (task.content.startsWith("* ")) {
+    task.noteMode = true;
+    task.content = task.content.slice(2);
+  }
+
   return task;
 }
 
