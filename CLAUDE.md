@@ -16,7 +16,7 @@ npm run build     # production build → main.js（sourcemapなし）
 npm run dev       # watch mode（~/Documents/main/.obsidian/plugins/tasklens/ へ自動コピー）
 ```
 
-- **テスト・リント・CIは未導入**（`npm test`等は存在しない）
+- **テスト**: `npm test`（vitest run）, `npm run test:watch`（vitest watch）— リント・CIは未導入
 - 成果物: `main.js`（バンドル）, `styles.css`（手書き）, `manifest.json`
 - `styles.css` はObsidian CSSカスタムプロパティ（`--text-normal`, `--background-primary`等）を使用
 - esbuildの外部モジュール: `obsidian`, `electron`, `@codemirror/*`, `@lezer/*`
