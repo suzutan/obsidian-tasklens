@@ -1,0 +1,18 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "extra-files": [
+        { "type": "json", "path": "manifest.json", "jsonpath": "$.version" }
+      ],
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "chore", "section": "Miscellaneous" },
+        { "type": "ci", "section": "CI" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "refactor", "section": "Refactoring" }
+      ]
+    }
+  }
+}
