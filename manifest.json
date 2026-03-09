@@ -1,0 +1,9 @@
+{
+  "id": "tasklens",
+  "name": "TaskLens",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Task management with full-screen view",
+  "author": "suzutan",
+  "isDesktopOnly": false
+}

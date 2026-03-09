@@ -1,0 +1,1571 @@
+/* ===================================
+   TaskLens - Obsidian Plugin CSS
+   =================================== */
+
+/* Container - full view */
+.tasklens-view-container {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* ===== 3-Column Layout ===== */
+.tasklens-app {
+  display: flex;
+  height: 100%;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-normal);
+  background: var(--background-primary);
+}
+
+/* ===== Sidebar ===== */
+.tasklens-sidebar {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.tasklens-sidebar-inner {
+  padding: 12px 0;
+}
+
+/* Nav items */
+.tasklens-nav {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 8px;
+}
+
+.tasklens-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.1s;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.tasklens-nav-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-nav-item--active {
+  background: var(--background-modifier-active-hover);
+  font-weight: 600;
+}
+
+.tasklens-nav-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.tasklens-nav-label {
+  flex: 1;
+}
+
+.tasklens-nav-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--background-modifier-border);
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Sidebar sections */
+.tasklens-sidebar-section {
+  padding: 4px 0;
+}
+
+.tasklens-sidebar-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.tasklens-btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.tasklens-btn-icon:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Project tree */
+.tasklens-project-tree {
+  padding: 2px 0;
+}
+
+.tasklens-tree-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 16px 5px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  gap: 8px;
+  transition: background 0.1s;
+}
+
+.tasklens-tree-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-tree-item--active {
+  background: var(--background-modifier-active-hover);
+  font-weight: 600;
+}
+
+.tasklens-tree-item--dragging {
+  opacity: 0.4;
+}
+
+.tasklens-tree-item--drop-above {
+  border-top: 2px solid var(--interactive-accent) !important;
+}
+
+.tasklens-tree-item--drop-below {
+  border-bottom: 2px solid var(--interactive-accent) !important;
+}
+
+.tasklens-tree-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.tasklens-tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tasklens-tree-folder-header {
+  display: flex;
+  align-items: center;
+  padding: 5px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  gap: 4px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tasklens-tree-folder-header:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-tree-folder-header--drop {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-radius: 4px;
+}
+
+.tasklens-tree-arrow {
+  font-size: 10px;
+  width: 16px;
+  text-align: center;
+}
+
+.tasklens-tree-folder-children {
+  padding-left: 8px;
+}
+
+/* Add project input */
+.tasklens-add-project {
+  padding: 4px 16px 4px 24px;
+}
+
+/* Add filter form */
+.tasklens-add-filter {
+  padding: 8px 16px 8px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tasklens-filter-name-row {
+  display: flex;
+  gap: 6px;
+}
+
+/* Emoji picker */
+.tasklens-emoji-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tasklens-emoji-picker-trigger {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  cursor: pointer;
+}
+
+.tasklens-emoji-picker-trigger:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-emoji-picker-popover {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 200;
+  width: 260px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-s);
+  padding: 8px;
+}
+
+.tasklens-emoji-picker-category-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 4px 0 2px;
+  font-weight: 600;
+}
+
+.tasklens-emoji-picker-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.tasklens-emoji-picker-item {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tasklens-emoji-picker-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-emoji-picker-item--active {
+  background: var(--interactive-accent);
+  border-radius: 4px;
+}
+
+.tasklens-filter-name-input {
+  flex: 1;
+}
+
+.tasklens-filter-query-input {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.tasklens-add-filter-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Sidebar empty state */
+.tasklens-sidebar-empty {
+  padding: 4px 16px 4px 40px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.tasklens-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.tasklens-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+}
+
+/* ===== Main Content ===== */
+.tasklens-main {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.tasklens-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+.tasklens-content-header {
+  margin-bottom: 24px;
+}
+
+.tasklens-content-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  padding: 0;
+  border: none;
+}
+
+.tasklens-content-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tasklens-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+  font-size: 14px;
+}
+
+/* ===== Sections ===== */
+.tasklens-section {
+  margin-bottom: 16px;
+}
+
+.tasklens-section-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  gap: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 4px;
+  user-select: none;
+}
+
+.tasklens-section-header--overdue {
+  color: #d1453b;
+}
+
+.tasklens-section-arrow {
+  font-size: 10px;
+  width: 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.tasklens-section-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tasklens-section-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ===== Add Section Button ===== */
+.tasklens-add-section-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  border-top: 1px dashed transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 8px;
+}
+
+.tasklens-add-section-btn:hover {
+  color: var(--interactive-accent);
+  border-top-color: var(--interactive-accent);
+}
+
+.tasklens-add-section-icon {
+  font-size: 16px;
+  font-weight: 600;
+  width: 20px;
+  text-align: center;
+}
+
+.tasklens-add-section-form {
+  margin-top: 8px;
+  padding: 8px 4px;
+  border-top: 1px solid var(--interactive-accent);
+}
+
+.tasklens-add-section-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tasklens-add-section-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.tasklens-add-section-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tasklens-btn-sm {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+/* ===== Task Items ===== */
+.tasklens-task-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tasklens-task-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 4px;
+  gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--background-modifier-border-hover);
+  transition: background 0.1s;
+  border-radius: 4px;
+}
+
+.tasklens-task-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-task-item--selected {
+  background: var(--background-modifier-active-hover);
+}
+
+.tasklens-task-item--done {
+  opacity: 0.6;
+}
+
+/* Checkbox */
+.tasklens-checkbox {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.tasklens-checkbox:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.tasklens-checkbox--done {
+  border-width: 0;
+}
+
+.tasklens-checkbox-check {
+  width: 14px;
+  height: 14px;
+}
+
+/* Task content */
+.tasklens-task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tasklens-task-text {
+  font-size: 14px;
+  line-height: 1.4;
+  display: block;
+  word-wrap: break-word;
+}
+
+.tasklens-task-text--done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.tasklens-task-link {
+  color: var(--link-color, var(--interactive-accent));
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tasklens-task-link:hover {
+  color: var(--link-color-hover, var(--interactive-accent-hover));
+}
+
+.tasklens-task-wikilink {
+  color: var(--link-color, var(--interactive-accent));
+  cursor: pointer;
+}
+
+.tasklens-task-wikilink:hover {
+  text-decoration: underline;
+}
+
+/* Location chip in task list */
+.tasklens-location-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tasklens-location-chip--link {
+  color: var(--link-color, var(--interactive-accent));
+  cursor: pointer;
+}
+
+.tasklens-location-chip--link:hover {
+  text-decoration: underline;
+}
+
+/* Location in detail panel */
+.tasklens-location-display {
+  cursor: pointer;
+}
+
+.tasklens-location-link {
+  color: var(--link-color, var(--interactive-accent));
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.tasklens-location-link:hover {
+  text-decoration: underline;
+}
+
+.tasklens-location-text {
+  font-size: 13px;
+  color: var(--text-normal);
+}
+
+.tasklens-location-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tasklens-location-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tasklens-location-edit-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.tasklens-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+/* Date chip */
+.tasklens-date-chip {
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.tasklens-date-chip-repeat {
+  font-size: 10px;
+}
+
+/* Priority flag */
+.tasklens-priority-flag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Label badge */
+.tasklens-label-badge {
+  font-size: 11px;
+  color: var(--text-accent);
+  background: var(--background-modifier-hover);
+  padding: 1px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tasklens-label-badge:hover {
+  background: var(--background-modifier-active-hover);
+}
+
+/* Task project name */
+.tasklens-task-project {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Completed section */
+.tasklens-completed-section {
+  margin-top: 8px;
+}
+
+.tasklens-completed-header {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ===== Inline Add ===== */
+.tasklens-inline-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: color 0.1s;
+  border-radius: 4px;
+}
+
+.tasklens-inline-add:hover {
+  color: var(--interactive-accent);
+}
+
+.tasklens-inline-add-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tasklens-inline-add:hover .tasklens-inline-add-icon {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.tasklens-inline-add-form {
+  padding: 8px 4px;
+}
+
+.tasklens-inline-add-input {
+  margin-bottom: 8px;
+}
+
+.tasklens-inline-add-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.tasklens-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.tasklens-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-btn-primary {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+}
+
+.tasklens-btn-primary:hover {
+  background: var(--interactive-accent-hover);
+}
+
+/* ===== Detail Modal (TaskLens-style overlay) ===== */
+.tasklens-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tasklens-fade-in 0.15s ease;
+}
+
+@keyframes tasklens-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tasklens-detail-modal {
+  width: 90%;
+  max-width: 900px;
+  height: 80%;
+  max-height: 700px;
+  background: var(--background-primary);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: tasklens-modal-in 0.2s ease;
+}
+
+@keyframes tasklens-modal-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.tasklens-detail-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tasklens-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+.tasklens-detail-header-project {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.tasklens-detail-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.tasklens-detail-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tasklens-detail-left {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+.tasklens-detail-right {
+  width: 260px;
+  min-width: 260px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tasklens-detail-task-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tasklens-detail-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.tasklens-detail-title:hover {
+  color: var(--interactive-accent);
+}
+
+.tasklens-detail-title-input {
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.tasklens-detail-description {
+  margin-top: 8px;
+  padding-left: 36px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tasklens-detail-done {
+  margin-top: 16px;
+  padding-left: 36px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Right column fields — TaskLens style */
+.tasklens-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.tasklens-detail-field:first-child {
+  padding-top: 0;
+}
+
+.tasklens-detail-field:last-child {
+  border-bottom: none;
+}
+
+.tasklens-detail-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tasklens-detail-field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tasklens-detail-field-add {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.tasklens-detail-field-add:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-detail-field-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-normal);
+  padding: 2px 0;
+}
+
+.tasklens-detail-field-value--clickable {
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tasklens-detail-field-value--clickable:hover {
+  color: var(--interactive-accent);
+}
+
+.tasklens-detail-field-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tasklens-detail-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tasklens-detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tasklens-priority-flag {
+  font-size: 14px;
+}
+
+.tasklens-detail-value {
+  font-size: 14px;
+  color: var(--text-normal);
+}
+
+.tasklens-detail-priority-group {
+  display: flex;
+  gap: 6px;
+}
+
+.tasklens-priority-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.1s;
+}
+
+.tasklens-priority-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-priority-btn--active {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.tasklens-priority-btn[data-priority="1"].tasklens-priority-btn--active {
+  color: #d1453b;
+  border-color: #d1453b;
+}
+
+.tasklens-priority-btn[data-priority="2"].tasklens-priority-btn--active {
+  color: #eb8909;
+  border-color: #eb8909;
+}
+
+.tasklens-priority-btn[data-priority="3"].tasklens-priority-btn--active {
+  color: #246fe0;
+  border-color: #246fe0;
+}
+
+/* ===== DatePicker (TaskLens-style) ===== */
+.tasklens-detail-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tasklens-datepicker {
+  position: relative;
+  width: 100%;
+}
+
+.tasklens-datepicker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.tasklens-datepicker-trigger:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-datepicker-trigger--set {
+  background: var(--background-secondary);
+}
+
+.tasklens-datepicker-trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tasklens-datepicker-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.tasklens-datepicker-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tasklens-datepicker-trigger-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tasklens-datepicker-value {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tasklens-datepicker-raw {
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.tasklens-datepicker-placeholder {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.tasklens-datepicker-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tasklens-datepicker-clear:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.tasklens-datepicker-hint {
+  font-size: 10px;
+  color: var(--text-faint);
+  padding: 0 10px 2px 38px;
+}
+
+/* Popover */
+.tasklens-datepicker-popover {
+  position: fixed;
+  z-index: 300;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 8px 0;
+  width: 260px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: tasklens-datepicker-in 0.12s ease;
+  min-width: 280px;
+}
+
+@keyframes tasklens-datepicker-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shortcuts */
+.tasklens-datepicker-shortcuts {
+  padding: 0 4px;
+}
+
+.tasklens-datepicker-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-normal);
+  text-align: left;
+  transition: background 0.08s;
+}
+
+.tasklens-datepicker-shortcut:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-datepicker-shortcut--clear {
+  color: var(--text-muted);
+}
+
+.tasklens-datepicker-shortcut-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.tasklens-datepicker-shortcut-day {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.tasklens-datepicker-divider {
+  height: 1px;
+  background: var(--background-modifier-border);
+  margin: 6px 0;
+}
+
+/* Time picker */
+.tasklens-datepicker-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+}
+
+.tasklens-datepicker-time-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tasklens-datepicker-time-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 13px;
+  max-width: 100px;
+}
+
+.tasklens-datepicker-time-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.tasklens-datepicker-time-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.tasklens-datepicker-time-clear:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-date-chip-time {
+  font-weight: 600;
+}
+
+/* Mini calendar */
+.tasklens-datepicker-calendar {
+  padding: 4px 12px 8px;
+}
+
+.tasklens-datepicker-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 6px;
+}
+
+.tasklens-datepicker-cal-nav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.tasklens-datepicker-cal-nav:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.tasklens-datepicker-cal-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.tasklens-datepicker-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.tasklens-datepicker-cal-dayheader {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-faint);
+  padding: 4px 0;
+  font-weight: 600;
+}
+
+.tasklens-datepicker-cal-empty {
+  /* empty cell */
+}
+
+.tasklens-datepicker-cal-day {
+  text-align: center;
+  padding: 4px 0;
+  font-size: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--text-normal);
+  transition: background 0.08s;
+}
+
+.tasklens-datepicker-cal-day:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-datepicker-cal-day--today {
+  font-weight: 700;
+  color: var(--interactive-accent);
+}
+
+.tasklens-datepicker-cal-day--selected {
+  background: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  font-weight: 600;
+}
+
+.tasklens-datepicker-cal-day--past {
+  color: var(--text-faint);
+}
+
+.tasklens-detail-value--clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.tasklens-detail-value--clickable:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-detail-recurrence-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tasklens-detail-recurrence-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tasklens-recurrence-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tasklens-recurrence-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+}
+
+.tasklens-recurrence-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tasklens-recurrence-interval-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tasklens-select {
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 13px;
+}
+
+.tasklens-input--small {
+  width: 60px;
+  padding: 4px 6px;
+  font-size: 13px;
+}
+
+.tasklens-btn--small {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.tasklens-btn-icon--small {
+  font-size: 12px;
+  padding: 1px 4px;
+}
+
+.tasklens-detail-labels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tasklens-label-badge--removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.tasklens-label-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.tasklens-label-remove:hover {
+  color: var(--text-normal);
+}
+
+.tasklens-label-add-form {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.tasklens-detail-children {
+  background: var(--background-secondary);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.tasklens-detail-child {
+  font-size: 13px;
+  padding: 2px 0;
+  color: var(--text-muted);
+}
+
+/* ===== Quick Add Modal ===== */
+.tasklens-quick-add-modal {
+  padding: 16px;
+}
+
+.tasklens-quick-add-input {
+  font-size: 16px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.tasklens-quick-add-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* ===== NLP Preview ===== */
+.tasklens-nlp-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.tasklens-nlp-preview--modal {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.tasklens-nlp-preview-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tasklens-nlp-preview-content {
+  color: var(--text-normal);
+  font-weight: 500;
+}
+
+.tasklens-nlp-preview-chip {
+  background: var(--background-modifier-hover);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ===== Drag & Drop ===== */
+.tasklens-task-drag-handle {
+  width: 16px;
+  min-width: 16px;
+  font-size: 14px;
+  color: transparent;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  margin-top: 2px;
+  letter-spacing: -2px;
+}
+
+.tasklens-task-item:hover .tasklens-task-drag-handle {
+  color: var(--text-muted);
+}
+
+.tasklens-task-drag-handle:active {
+  cursor: grabbing;
+}
+
+.tasklens-task-item--dragging {
+  opacity: 0.4;
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-task-item--drop-above {
+  box-shadow: 0 -2px 0 0 var(--interactive-accent);
+}
+
+.tasklens-task-item--drop-below {
+  box-shadow: 0 2px 0 0 var(--interactive-accent);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .tasklens-sidebar {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .tasklens-sidebar-inner {
+    padding: 8px 0;
+  }
+
+  .tasklens-sidebar-actions,
+  .tasklens-nav-label,
+  .tasklens-nav-count,
+  .tasklens-sidebar-section-header span,
+  .tasklens-tree-name,
+  .tasklens-tree-folder-name {
+    display: none;
+  }
+
+  .tasklens-nav-item {
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .tasklens-nav-icon {
+    font-size: 20px;
+  }
+
+  .tasklens-detail {
+    width: 300px;
+    min-width: 300px;
+  }
+
+  .tasklens-content {
+    padding: 16px 20px;
+  }
+}
