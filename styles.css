@@ -805,9 +805,14 @@
   flex-shrink: 0;
 }
 
-.tasklens-detail-header-project {
+.tasklens-detail-header-note {
   font-size: 13px;
   color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tasklens-detail-header-note:hover {
+  color: var(--interactive-accent);
 }
 
 .tasklens-detail-header-actions {
@@ -855,7 +860,8 @@
 }
 
 .tasklens-detail-title:hover {
-  color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+  border-radius: 4px;
 }
 
 .tasklens-detail-title-input {
@@ -944,6 +950,12 @@
 
 .tasklens-detail-field-value--clickable:hover {
   color: var(--interactive-accent);
+}
+
+.tasklens-detail-note-link {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
 }
 
 .tasklens-detail-field-icon {
@@ -1456,6 +1468,128 @@
   margin-top: 16px;
 }
 
+/* ===== Quick Add Picker ===== */
+.tasklens-quickadd-picker {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.tasklens-quickadd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tasklens-quickadd-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tasklens-quickadd-note-wrapper {
+  position: relative;
+}
+
+.tasklens-quickadd-note-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  cursor: pointer;
+  font-size: 13px;
+  min-height: 34px;
+  transition: border-color 0.1s;
+  overflow: hidden;
+}
+
+.tasklens-quickadd-note-display:hover {
+  border-color: var(--interactive-accent);
+}
+
+.tasklens-quickadd-note-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tasklens-quickadd-note-path {
+  color: var(--text-faint);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasklens-quickadd-note-search {
+  width: 100%;
+}
+
+.tasklens-quickadd-note-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.tasklens-quickadd-note-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.08s;
+  outline: none;
+}
+
+.tasklens-quickadd-note-item:hover,
+.tasklens-quickadd-note-item:focus {
+  background: var(--background-modifier-hover);
+}
+
+.tasklens-quickadd-note-item--active {
+  background: var(--background-modifier-active-hover);
+  font-weight: 600;
+}
+
+.tasklens-quickadd-note-item-name {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tasklens-quickadd-note-item-path {
+  color: var(--text-faint);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasklens-quickadd-note-empty {
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.tasklens-quickadd-section-select {
+  width: 100%;
+  padding: 6px 10px;
+  min-height: 34px;
+}
+
 /* ===== NLP Preview ===== */
 .tasklens-nlp-preview {
   display: flex;
@@ -1529,6 +1663,135 @@
 
 .tasklens-task-item--drop-below {
   box-shadow: 0 2px 0 0 var(--interactive-accent);
+}
+
+/* ===== Tag Suggest ===== */
+.tasklens-tag-suggest-wrapper {
+  position: relative;
+}
+
+.tasklens-tag-suggest-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.tasklens-tag-suggest-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-normal);
+  transition: background 0.08s;
+}
+
+.tasklens-tag-suggest-item:hover,
+.tasklens-tag-suggest-item--active {
+  background: var(--background-modifier-hover);
+  color: var(--text-accent);
+}
+
+/* ===== Timer Display ===== */
+
+/* Chip variant (in task list) */
+.tasklens-timer-chip {
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.tasklens-timer-icon {
+  font-size: 11px;
+}
+
+.tasklens-timer-label {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.tasklens-timer-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Detail variant (in detail panel) */
+.tasklens-detail-timer {
+  margin-top: 16px;
+  padding-left: 36px;
+}
+
+.tasklens-timer-detail {
+  padding: 12px 16px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.tasklens-timer-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.tasklens-timer-detail-icon {
+  font-size: 14px;
+}
+
+.tasklens-timer-detail-value {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.tasklens-timer-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tasklens-timer-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--background-modifier-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tasklens-timer-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+.tasklens-timer-progress-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tasklens-timer-detail-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 /* ===== Responsive ===== */
