@@ -118,6 +118,22 @@ src/
 実装: `TimerUtils.ts`（計算）+ `TimerDisplay.tsx`（表示、1秒interval更新）
 詳細パネルでは値の調整ボタン（-1, -10, +10, リセット, MAX）を表示。
 
+## 開発原則
+
+- **DRY, KISS, YAGNI** を守る
+- フォールバックコードは書かない
+- 将来の自分（claude code含む）や他の人が見たときにコンテキストを理解できるコードを書く
+
+## 開発サイクル
+
+1. 最新のmaster/mainを起点にブランチを作成
+2. 区切りの良い作業単位でcommit,push
+3. 1つ目のコミットを行った後は必ずPRを起票する
+   - master/mainとブランチの差分を確認し、PR title, bodyを作成・または更新する。
+   - PR Bodyは `.github/pull_request_template.md` をベースに書くこと。
+   - PR jobが成功することを確認する
+4. PR checkがpassしたらマージする
+
 ## コミット規約
 
 - 機能ごとに分けてコミット
