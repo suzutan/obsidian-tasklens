@@ -133,6 +133,11 @@ src/
    - PR Bodyは `.github/pull_request_template.md` をベースに書くこと。
    - PR jobが成功することを確認する
 4. PR checkがpassしたらマージする
+5. release-please が自動作成するリリースPRを確認し、マージする
+   - マージすると GitHub Release・タグ・リリースアセット（main.js, manifest.json, styles.css）が自動生成される
+   - ここまでが開発サイクルのワンセット
+
+**重要: masterへの直接pushは禁止。** CLAUDE.mdの変更を含め、すべての変更はブランチ→PR→マージの流れで行うこと。
 
 ## コミット規約
 
