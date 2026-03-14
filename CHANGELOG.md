@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.6.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.5.0...v0.6.0) (2026-03-14)
+
+
+### Features
+
+* add frontmatter visibility control and tasklens code block processor ([#33](https://github.com/suzutan/obsidian-tasklens/issues/33)) ([38ca2ad](https://github.com/suzutan/obsidian-tasklens/commit/38ca2ad1af6c6d6f4592c623c7683a5a0a7a8b5b))
+
+
+### Miscellaneous
+
+* **deps:** update dependency @biomejs/biome to v2.4.7 ([#32](https://github.com/suzutan/obsidian-tasklens/issues/32)) ([7715432](https://github.com/suzutan/obsidian-tasklens/commit/771543238fe51ead0e10adba24b9cf43082019e2))
+* **deps:** update dependency @types/node to v25.5.0 ([#22](https://github.com/suzutan/obsidian-tasklens/issues/22)) ([88bde18](https://github.com/suzutan/obsidian-tasklens/commit/88bde18b4eb1f1d212718ec88d2cf138f2e273cd))
+* **deps:** update dependency esbuild to v0.27.4 ([#30](https://github.com/suzutan/obsidian-tasklens/issues/30)) ([61fab21](https://github.com/suzutan/obsidian-tasklens/commit/61fab212929822d0adeb36e4cb175a4b3dfcd7e8))
+* **deps:** update dependency lefthook to v2.1.4 ([#29](https://github.com/suzutan/obsidian-tasklens/issues/29)) ([18acc0f](https://github.com/suzutan/obsidian-tasklens/commit/18acc0f323eb5415f95baff918fa418aba14c3dc))
+* **deps:** update dependency oxlint to v1.55.0 ([#27](https://github.com/suzutan/obsidian-tasklens/issues/27)) ([4712d42](https://github.com/suzutan/obsidian-tasklens/commit/4712d42442c7c51ae95109e02d4f37f9643957fd))
+* **deps:** update dependency preact to v10.29.0 ([#28](https://github.com/suzutan/obsidian-tasklens/issues/28)) ([eea1299](https://github.com/suzutan/obsidian-tasklens/commit/eea12992f7264a414672a8c585af1f43d6f8251c))
+* **deps:** update dependency vitest to v4.1.0 ([#31](https://github.com/suzutan/obsidian-tasklens/issues/31)) ([03fdc50](https://github.com/suzutan/obsidian-tasklens/commit/03fdc50358cd41678b2216c8e22d71affb4fc5e9))
+* migrate toolchain from esbuild+biome+lefthook to vite-plus ([#34](https://github.com/suzutan/obsidian-tasklens/issues/34)) ([66f4338](https://github.com/suzutan/obsidian-tasklens/commit/66f4338f2285fee84e09211ff05dfc17b6edd3ac))
+
+
+### Documentation
+
+* add release-please step and no-direct-push rule to dev cycle ([#26](https://github.com/suzutan/obsidian-tasklens/issues/26)) ([a20c512](https://github.com/suzutan/obsidian-tasklens/commit/a20c51219397f5812c650dbcb269dca54f52431e))
+* add release-please step to development cycle in CLAUDE.md ([3960f4b](https://github.com/suzutan/obsidian-tasklens/commit/3960f4b0dd2977032b93df4495b0a7c5352e13b1))
+
 ## [0.5.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.4.0...v0.5.0) (2026-03-09)
 
 
