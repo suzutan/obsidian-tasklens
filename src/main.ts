@@ -1,6 +1,7 @@
 import { Plugin } from "obsidian";
 import { QuickAddModal } from "./commands/QuickAddCommand";
 import { TimerGeneratorModal } from "./commands/TimerGeneratorCommand";
+import { registerCodeBlockProcessor } from "./processors/CodeBlockProcessor";
 import { DEFAULT_SETTINGS, type TaskLensSettings, TaskLensSettingTab } from "./settings";
 import { FileWatcher } from "./store/FileWatcher";
 import { TaskStore } from "./store/TaskStore";
@@ -62,6 +63,9 @@ export default class TaskLensPlugin extends Plugin {
 
     // Settings tab
     this.addSettingTab(new TaskLensSettingTab(this.app, this));
+
+    // Code block processor for embedded task lists
+    registerCodeBlockProcessor(this, this.store, this.fileWatcher);
 
     // Initialize file watcher after layout is ready
     this.app.workspace.onLayoutReady(async () => {

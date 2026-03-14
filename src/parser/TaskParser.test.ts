@@ -198,4 +198,22 @@ describe("parseTaskFile", () => {
     const result = parseTaskFile(content, "test.md");
     expect(result.sections.get("")?.length).toBe(1);
   });
+
+  it("parses hyphenated frontmatter keys", () => {
+    const content = ["---", "tasklens-visible: false", "---", "## Tasks", "- [ ] タスク1"].join("\n");
+    const result = parseTaskFile(content, "test.md");
+    expect(result.frontmatter["tasklens-visible"]).toBe(false);
+  });
+
+  it("parses boolean true in frontmatter", () => {
+    const content = ["---", "tasklens-visible: true", "---", "## Tasks", "- [ ] タスク1"].join("\n");
+    const result = parseTaskFile(content, "test.md");
+    expect(result.frontmatter["tasklens-visible"]).toBe(true);
+  });
+
+  it("parses boolean false in frontmatter", () => {
+    const content = ["---", "draft: false", "---", "## Tasks", "- [ ] タスク1"].join("\n");
+    const result = parseTaskFile(content, "test.md");
+    expect(result.frontmatter.draft).toBe(false);
+  });
 });
