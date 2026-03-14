@@ -17,17 +17,11 @@ jobs:
           cache: "npm"
       - run: npm ci
 
-      - name: Biome check (format + lint)
-        run: npx biome check src/
-
-      - name: Oxlint
-        run: npx oxlint src/
-
-      - name: TypeScript type check
-        run: npx tsc --noEmit --skipLibCheck
+      - name: Check (format + lint + typecheck)
+        run: npx vp check src/
 
       - name: Test
-        run: npm test
+        run: npx vp test run
 
       - name: Build
-        run: npm run build
+        run: npx vp build

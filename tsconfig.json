@@ -7,7 +7,7 @@
     "target": "ES2018",
     "allowJs": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
@@ -16,7 +16,8 @@
     "jsxImportSource": "preact",
     "paths": {
       "react": ["node_modules/preact/compat"],
-      "react-dom": ["node_modules/preact/compat"]
+      "react-dom": ["node_modules/preact/compat"],
+      "vitest": ["node_modules/vite-plus/dist/test"]
     },
     "outDir": "./dist",
     "rootDir": "./src"
