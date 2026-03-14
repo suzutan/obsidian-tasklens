@@ -218,7 +218,7 @@ export function parseTaskFile(content: string, projectPath: string): ParsedFile 
 function parseFrontmatter(lines: string[]): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const line of lines) {
-    const match = line.match(/^(\w+):\s*(.+)?$/);
+    const match = line.match(/^([\w-]+):\s*(.+)?$/);
     if (match) {
       const key = match[1];
       const rawValue: string = match[2]?.trim() ?? "";
@@ -228,6 +228,10 @@ function parseFrontmatter(lines: string[]): Record<string, unknown> {
           .slice(1, -1)
           .split(",")
           .map((s: string) => s.trim());
+      } else if (rawValue === "true") {
+        result[key] = true;
+      } else if (rawValue === "false") {
+        result[key] = false;
       } else {
         result[key] = rawValue;
       }

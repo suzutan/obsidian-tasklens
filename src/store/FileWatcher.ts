@@ -66,6 +66,8 @@ export class FileWatcher {
       const content = await this.app.vault.read(file);
       const parsed = parseTaskFile(content, file.path);
 
+      if (parsed.frontmatter["tasklens-visible"] === false) continue;
+
       // Only track files that have tasks
       let fileHasTasks = false;
       for (const [, tasks] of parsed.sections) {
@@ -86,6 +88,11 @@ export class FileWatcher {
   private async reloadFile(file: TFile): Promise<void> {
     const content = await this.app.vault.read(file);
     const parsed = parseTaskFile(content, file.path);
+
+    if (parsed.frontmatter["tasklens-visible"] === false) {
+      this.store.removeFile(file.path);
+      return;
+    }
 
     const tasks: Task[] = [];
     let hasTasks = false;

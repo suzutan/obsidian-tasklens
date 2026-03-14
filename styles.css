@@ -1995,3 +1995,24 @@
 .tasklens-task-item--note .tasklens-task-text {
   color: var(--text-muted);
 }
+
+/* ===== Embedded View (Code Block Processor) ===== */
+.tasklens-embed-container {
+  margin: 8px 0;
+}
+
+.tasklens-embed {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.tasklens-embed-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.tasklens-embed .tasklens-task-drag-handle {
+  display: none;
+}
