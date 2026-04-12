@@ -1,9 +1,13 @@
 import { type App, Modal } from "obsidian";
+import { render } from "preact";
+import type { Priority } from "../models/Task";
+import type { ParsedInput } from "../parser/NaturalLanguageParser";
 import { parseNaturalLanguage } from "../parser/NaturalLanguageParser";
 import type { FileWatcher } from "../store/FileWatcher";
 import type { TaskStore } from "../store/TaskStore";
 import { getDateLabel } from "../utils/DateUtils";
 import { applyTagSuggestion, getTagSuggestions, type TagSuggestState } from "../utils/TagSuggest";
+import { QuickAddFields, type QuickAddFieldValues } from "../components/common/QuickAddFields";
 
 export class QuickAddModal extends Modal {
   private store: TaskStore;
@@ -20,6 +24,18 @@ export class QuickAddModal extends Modal {
   private tagDropdownEl: HTMLElement | null = null;
   private tagState: TagSuggestState | null = null;
   private tagSelectedIdx = 0;
+  private fieldsContainerEl: HTMLElement | null = null;
+  private fieldValues: QuickAddFieldValues = {
+    priority: 4 as Priority,
+    dueDate: null,
+    dueTime: null,
+    scheduledDate: null,
+    scheduledTime: null,
+    startDate: null,
+    startTime: null,
+    labels: [],
+    recurrence: null,
+  };
 
   constructor(app: App, store: TaskStore, fileWatcher: FileWatcher) {
     super(app);
@@ -89,6 +105,10 @@ export class QuickAddModal extends Modal {
     // NLP Preview
     this.previewEl = contentEl.createDiv({ cls: "tasklens-nlp-preview tasklens-nlp-preview--modal" });
     this.previewEl.style.display = "none";
+
+    // --- Metadata fields (Preact) ---
+    this.fieldsContainerEl = contentEl.createDiv({ cls: "tasklens-quickadd-fields-container" });
+    this.renderFields();
 
     // --- Note picker ---
     const pickerRow = contentEl.createDiv({ cls: "tasklens-quickadd-picker" });
@@ -162,6 +182,21 @@ export class QuickAddModal extends Modal {
       cls: "tasklens-btn",
     });
     cancelBtn.addEventListener("click", () => this.close());
+  }
+
+  private renderFields(): void {
+    if (!this.fieldsContainerEl) return;
+    render(
+      QuickAddFields({
+        values: this.fieldValues,
+        onChange: (values: QuickAddFieldValues) => {
+          this.fieldValues = values;
+          this.renderFields();
+        },
+        allLabels: this.store.allLabels.value,
+      }),
+      this.fieldsContainerEl,
+    );
   }
 
   private renderNoteDisplay(): void {
@@ -377,11 +412,35 @@ export class QuickAddModal extends Modal {
 
   private async submit(): Promise<void> {
     if (!this.content.trim()) return;
-    await this.fileWatcher.addTask(this.targetFile, this.section, this.content.trim());
+
+    // Parse NLP from text input
+    const parsed = parseNaturalLanguage(this.content.trim());
+
+    // Merge UI field values (UI takes precedence over NLP when set)
+    const merged: ParsedInput = {
+      content: parsed.content,
+      dueDate: this.fieldValues.dueDate ?? parsed.dueDate,
+      dueTime: this.fieldValues.dueDate ? (this.fieldValues.dueTime ?? parsed.dueTime) : parsed.dueTime,
+      scheduledDate: this.fieldValues.scheduledDate ?? parsed.scheduledDate,
+      scheduledTime: this.fieldValues.scheduledDate
+        ? (this.fieldValues.scheduledTime ?? parsed.scheduledTime)
+        : parsed.scheduledTime,
+      startDate: this.fieldValues.startDate ?? parsed.startDate,
+      startTime: this.fieldValues.startDate ? (this.fieldValues.startTime ?? parsed.startTime) : parsed.startTime,
+      priority: this.fieldValues.priority !== 4 ? this.fieldValues.priority : parsed.priority,
+      labels: [...new Set([...parsed.labels, ...this.fieldValues.labels])],
+      noteMode: parsed.noteMode,
+    };
+
+    await this.fileWatcher.addTaskFromParsed(this.targetFile, this.section, merged, this.fieldValues.recurrence);
     this.close();
   }
 
   onClose(): void {
+    // Unmount Preact
+    if (this.fieldsContainerEl) {
+      render(null, this.fieldsContainerEl);
+    }
     this.contentEl.empty();
     this.previewEl = null;
     this.noteSearchEl = null;
@@ -391,5 +450,6 @@ export class QuickAddModal extends Modal {
     this.inputEl = null;
     this.tagDropdownEl = null;
     this.tagState = null;
+    this.fieldsContainerEl = null;
   }
 }

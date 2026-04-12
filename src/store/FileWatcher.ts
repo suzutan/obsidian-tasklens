@@ -1,6 +1,6 @@
 import { type App, debounce, TFile } from "obsidian";
-import { getNextDueDate } from "../models/RecurrenceRule";
-import { createTaskId, type Priority, type Task } from "../models/Task";
+import { getNextDueDate, serializeRecurrence } from "../models/RecurrenceRule";
+import { createTaskId, type Priority, type RecurrenceRule, type Task } from "../models/Task";
 import { type ParsedInput, parseNaturalLanguage } from "../parser/NaturalLanguageParser";
 import { parseTaskFile } from "../parser/TaskParser";
 import { serializeTask } from "../parser/TaskSerializer";
@@ -204,7 +204,7 @@ export class FileWatcher {
   /**
    * Build the markdown line for a new task using Obsidian Tasks emoji format
    */
-  private buildTaskLine(parsed: ParsedInput): string {
+  private buildTaskLine(parsed: ParsedInput, recurrence?: RecurrenceRule | null): string {
     const content = parsed.noteMode ? `* ${parsed.content}` : parsed.content;
     const parts: string[] = [content];
 
@@ -213,6 +213,10 @@ export class FileWatcher {
     if (parsed.priority === 1) parts.push("⏫");
     else if (parsed.priority === 2) parts.push("🔼");
     else if (parsed.priority === 3) parts.push("🔽");
+
+    if (recurrence) {
+      parts.push(`🔁 ${serializeRecurrence(recurrence)}`);
+    }
 
     if (parsed.dueDate) {
       const time = parsed.dueTime ? `T${parsed.dueTime}` : "";
@@ -294,6 +298,83 @@ export class FileWatcher {
 
       if (!inserted) {
         // Section not found, append
+        newLines.push("");
+        newLines.push(`## ${section}`);
+        newLines.push("");
+        newLines.push(taskLine);
+      }
+
+      let result = newLines.join("\n");
+      if (/updated:\s*.+/.test(result)) {
+        result = result.replace(/updated:\s*.+/, `updated: ${formatDateTimeForFrontmatter()}`);
+      }
+
+      await this.app.vault.modify(file, result);
+      await this.reloadFile(file);
+    } finally {
+      this.writing = false;
+    }
+  }
+
+  /**
+   * Add a new task from pre-built ParsedInput (with optional recurrence).
+   * Used by QuickAdd when UI fields provide structured data.
+   */
+  async addTaskFromParsed(
+    filePath: string,
+    section: string,
+    parsed: ParsedInput,
+    recurrence?: RecurrenceRule | null,
+  ): Promise<void> {
+    if (!parsed.content.trim()) return;
+
+    const targetPath = filePath || this.defaultTarget;
+    let file = this.app.vault.getAbstractFileByPath(targetPath);
+
+    if (!file) {
+      const dir = targetPath.substring(0, targetPath.lastIndexOf("/"));
+      if (dir) {
+        const dirFile = this.app.vault.getAbstractFileByPath(dir);
+        if (!dirFile) await this.app.vault.createFolder(dir);
+      }
+      const now = formatDateTimeForFrontmatter();
+      const name = targetPath.replace(/\.md$/, "").split("/").pop() || "Inbox";
+      const content = `---\ntitle: ${name}\ncreated: ${now}\nupdated: ${now}\n---\n\n# ${name}\n\n## ${section || "inbox"}\n\n`;
+      await this.app.vault.create(targetPath, content);
+      file = this.app.vault.getAbstractFileByPath(targetPath);
+    }
+
+    if (!(file instanceof TFile)) return;
+
+    this.writing = true;
+    try {
+      const fileContent = await this.app.vault.read(file);
+      const lines = fileContent.split("\n");
+      const newLines: string[] = [];
+      let currentSection = "";
+      let inserted = false;
+
+      const taskLine = this.buildTaskLine(parsed, recurrence);
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const sectionMatch = line.match(/^## (.+)$/);
+        if (sectionMatch) {
+          if (currentSection === section && !inserted) {
+            newLines.push(taskLine);
+            inserted = true;
+          }
+          currentSection = sectionMatch[1].trim();
+        }
+        newLines.push(line);
+      }
+
+      if (currentSection === section && !inserted) {
+        newLines.push(taskLine);
+        inserted = true;
+      }
+
+      if (!inserted) {
         newLines.push("");
         newLines.push(`## ${section}`);
         newLines.push("");
