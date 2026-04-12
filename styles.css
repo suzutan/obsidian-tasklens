@@ -1624,6 +1624,104 @@
   min-height: 34px;
 }
 
+/* ===== QuickAdd Metadata Fields ===== */
+.tasklens-quickadd-fields-container {
+  margin-bottom: 12px;
+}
+
+.tasklens-quickadd-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+}
+
+.tasklens-quickadd-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tasklens-quickadd-field-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tasklens-quickadd-fields .tasklens-quickadd-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tasklens-quickadd-dates-row {
+  display: flex;
+  gap: 12px;
+}
+
+.tasklens-quickadd-date-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.tasklens-quickadd-labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.tasklens-quickadd-label-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tasklens-quickadd-label-input-wrapper input {
+  width: 100px;
+}
+
+.tasklens-quickadd-label-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.tasklens-quickadd-label-suggestion {
+  background: var(--background-modifier-hover);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.tasklens-quickadd-label-suggestion:hover {
+  background: var(--background-modifier-active-hover);
+  color: var(--text-normal);
+}
+
+.tasklens-quickadd-recurrence-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--background-modifier-hover);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tasklens-quickadd-recurrence-display:hover {
+  background: var(--background-modifier-active-hover);
+}
+
 /* ===== NLP Preview ===== */
 .tasklens-nlp-preview {
   display: flex;
