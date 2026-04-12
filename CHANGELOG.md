@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.6.0...v0.7.0) (2026-04-12)
+
+
+### Features
+
+* add metadata UI fields to QuickAdd modal ([#43](https://github.com/suzutan/obsidian-tasklens/issues/43)) ([ee2b585](https://github.com/suzutan/obsidian-tasklens/commit/ee2b5853dd5e501314ed548e5fde260110d0eafa))
+
+
+### Miscellaneous
+
+* **deps:** update dependency vite-plus to v0.1.16 ([#42](https://github.com/suzutan/obsidian-tasklens/issues/42)) ([8f8f957](https://github.com/suzutan/obsidian-tasklens/commit/8f8f9577e2fe5a696a396baf44445f6adaad365b))
+
 ## [0.6.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.5.0...v0.6.0) (2026-04-11)
 
 
