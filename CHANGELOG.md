@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.1](https://github.com/suzutan/obsidian-tasklens/compare/v0.7.0...v0.7.1) (2026-05-03)
+
+
+### Miscellaneous
+
+* **deps-dev:** bump vite-plus from 0.1.16 to 0.1.17 ([#46](https://github.com/suzutan/obsidian-tasklens/issues/46)) ([f61e76e](https://github.com/suzutan/obsidian-tasklens/commit/f61e76e7dcfa19d50ff219102211870dde8109dc))
+* **deps:** update dependency typescript to v6.0.3 ([#48](https://github.com/suzutan/obsidian-tasklens/issues/48)) ([bd7ff42](https://github.com/suzutan/obsidian-tasklens/commit/bd7ff42d5766d8a520af28343c3fd12ba929c761))
+* **deps:** update dependency vite-plus to v0.1.17 [security] ([#47](https://github.com/suzutan/obsidian-tasklens/issues/47)) ([52804ed](https://github.com/suzutan/obsidian-tasklens/commit/52804edd25acc8a3a41bc3223304fe36ff87eeee))
+* **deps:** update googleapis/release-please-action action to v5 ([#49](https://github.com/suzutan/obsidian-tasklens/issues/49)) ([423cc4d](https://github.com/suzutan/obsidian-tasklens/commit/423cc4dadf364a803636174cd663c0c930ec1da4))
+
 ## [0.7.0](https://github.com/suzutan/obsidian-tasklens/compare/v0.6.0...v0.7.0) (2026-04-12)
 
 
