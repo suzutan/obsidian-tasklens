@@ -23,6 +23,6 @@
     "obsidian": "latest",
     "preact": "^10.25.4",
     "typescript": "^6.0.0",
-    "vite-plus": "^0.1.11"
+    "vite-plus": "^0.1.17"
   }
 }
