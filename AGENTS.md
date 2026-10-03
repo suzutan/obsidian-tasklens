@@ -137,7 +137,7 @@ src/
    - マージすると GitHub Release・タグ・リリースアセット（main.js, manifest.json, styles.css）が自動生成される
    - ここまでが開発サイクルのワンセット
 
-**重要: masterへの直接pushは禁止。** CLAUDE.mdの変更を含め、すべての変更はブランチ→PR→マージの流れで行うこと。
+**重要: masterへの直接pushは禁止。** AGENTS.mdの変更を含め、すべての変更はブランチ→PR→マージの流れで行うこと。
 
 ## コミット規約
 
