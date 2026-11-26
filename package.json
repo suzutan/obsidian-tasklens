@@ -18,7 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "@preact/signals": "^2.8.2",
-    "@types/node": "^25.3.5",
+    "@types/node": "^26.0.0",
     "htm": "^3.1.1",
     "obsidian": "latest",
     "preact": "^10.25.4",
